@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "./sql"
+    schema: "./../resources/changelog"
+    gen:
+      go:
+        package: "db"
+        out: "./"
+        sql_package: "pgx/v5"
