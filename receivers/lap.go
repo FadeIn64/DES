@@ -76,7 +76,7 @@ func (l *lapReceiver) Close() error {
 	return nil
 }
 
-func (l *lapReceiver) sendData(lap *models.Lap) error {
+func (l *lapReceiver) sendData(lap *models.F1Lap) error {
 	bytes, err := json.Marshal(lap)
 	if err != nil {
 		return err

@@ -29,7 +29,7 @@ func seedLaps(ctx context.Context, pool *pgxpool.Pool) error {
 	return nil
 }
 
-func convertLapToInsert(lap *models.Lap) *db.InsertLapParams {
+func convertLapToInsert(lap *models.F1Lap) *db.InsertLapParams {
 	return &db.InsertLapParams{
 		MeetingKey:      lap.MeetingKey,
 		SessionKey:      lap.SessionKey,

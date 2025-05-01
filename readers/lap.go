@@ -9,9 +9,9 @@ import (
 
 var lapsPath = "./resources/laps_data"
 
-func ReadLapsData() ([]models.Lap, error) {
+func ReadLapsData() ([]models.F1Lap, error) {
 
-	var res []models.Lap
+	var res []models.F1Lap
 
 	// Получаем список файлов в папке
 	files, err := os.ReadDir(lapsPath)
@@ -32,7 +32,7 @@ func ReadLapsData() ([]models.Lap, error) {
 		if err != nil {
 			return nil, err
 		}
-		var laps []models.Lap
+		var laps []models.F1Lap
 		err = json.Unmarshal(content, &laps)
 		if err != nil {
 			return nil, err

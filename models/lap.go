@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type Lap struct {
+type F1Lap struct {
 	MeetingKey      int32     `json:"meeting_key"`
 	SessionKey      int32     `json:"session_key"`
 	DriverNumber    int32     `json:"driver_number"`

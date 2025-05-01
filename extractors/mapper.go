@@ -5,8 +5,8 @@ import (
 	"DES/models"
 )
 
-func convertToLapModel(entity db.Lap) (*models.Lap, error) {
-	return &models.Lap{
+func convertToLapModel(entity db.Lap) (*models.F1Lap, error) {
+	return &models.F1Lap{
 		MeetingKey:      entity.MeetingKey,
 		SessionKey:      entity.SessionKey,
 		DriverNumber:    entity.DriverNumber.Int32,
@@ -26,8 +26,8 @@ func convertToLapModel(entity db.Lap) (*models.Lap, error) {
 	}, nil
 }
 
-func convertToLapModels(entity []db.Lap) ([]models.Lap, error) {
-	result := make([]models.Lap, len(entity))
+func convertToLapModels(entity []db.Lap) ([]models.F1Lap, error) {
+	result := make([]models.F1Lap, len(entity))
 	for i, lap := range entity {
 		lapModel, err := convertToLapModel(lap)
 		if err != nil {
