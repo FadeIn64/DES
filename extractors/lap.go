@@ -10,7 +10,7 @@ import (
 )
 
 type LapExtractor interface {
-	ExtractLaps(ctx context.Context, from time.Time, to time.Time) ([]models.F1Lap, error)
+	ExtractLaps(ctx context.Context, from time.Time, to time.Time) ([]models.Lap, error)
 }
 
 func NewLapExtractor(pool *pgxpool.Pool) LapExtractor {
@@ -21,13 +21,13 @@ type lapExtractor struct {
 	pool *pgxpool.Pool
 }
 
-func (l *lapExtractor) ExtractLaps(ctx context.Context, from time.Time, to time.Time) ([]models.F1Lap, error) {
+func (l *lapExtractor) ExtractLaps(ctx context.Context, from time.Time, to time.Time) ([]models.Lap, error) {
 
 	q := db.New(l.pool)
 
 	args := db.GetLapsStartDateBetweenParams{
-		DateStart:   pgtype.Timestamp{Time: from, Valid: true},
-		DateStart_2: pgtype.Timestamp{Time: to, Valid: true},
+		InfoTime:   pgtype.Timestamptz{Time: from, Valid: true},
+		InfoTime_2: pgtype.Timestamptz{Time: to, Valid: true},
 	}
 
 	laps, err := q.GetLapsStartDateBetween(ctx, args)
