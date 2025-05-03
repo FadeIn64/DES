@@ -11,12 +11,18 @@ import (
 
 func seedLaps(ctx context.Context, pool *pgxpool.Pool) error {
 
-	laps, err := readers.ReadLapsData()
+	f1laps, err := readers.ReadLapsData()
 	if err != nil {
 		return err
 	}
 
 	q := db.New(pool)
+
+	laps := make([]models.Lap, 0, len(f1laps)*3)
+
+	for _, f1lap := range f1laps {
+		laps = append(laps, models.F1LapToSectorLapsWithTiming(f1lap)...)
+	}
 
 	for _, lap := range laps {
 		args := convertLapToInsert(&lap)
@@ -29,23 +35,15 @@ func seedLaps(ctx context.Context, pool *pgxpool.Pool) error {
 	return nil
 }
 
-func convertLapToInsert(lap *models.F1Lap) *db.InsertLapParams {
+func convertLapToInsert(lap *models.Lap) *db.InsertLapParams {
 	return &db.InsertLapParams{
-		MeetingKey:      lap.MeetingKey,
-		SessionKey:      lap.SessionKey,
-		DriverNumber:    pgtype.Int4{Int32: lap.DriverNumber, Valid: true},
-		I1Speed:         pgtype.Int4{Int32: lap.I1Speed, Valid: true},
-		I2Speed:         pgtype.Int4{Int32: lap.I2Speed, Valid: true},
-		StSpeed:         pgtype.Int4{Int32: lap.StSpeed, Valid: true},
-		DateStart:       pgtype.Timestamp{Time: lap.DateStart, Valid: true},
-		LapDuration:     pgtype.Float8{Float64: lap.LapDuration, Valid: true},
-		IsPitOutLap:     pgtype.Bool{Bool: lap.IsPitOutLap, Valid: true},
-		DurationSector1: pgtype.Float8{Float64: lap.DurationSector1, Valid: true},
-		DurationSector2: pgtype.Float8{Float64: lap.DurationSector2, Valid: true},
-		DurationSector3: pgtype.Float8{Float64: lap.DurationSector3, Valid: true},
-		SegmentsSector1: lap.SegmentsSector1,
-		SegmentsSector2: lap.SegmentsSector2,
-		SegmentsSector3: lap.SegmentsSector3,
-		LapNumber:       lap.LapNumber,
+		MeetingKey:     lap.MeetingKey,
+		SessionKey:     lap.SessionKey,
+		DriverNumber:   lap.DriverNumber,
+		DateStart:      pgtype.Timestamptz{Time: lap.DateStart, Valid: true},
+		LapDuration:    lap.LapDuration,
+		LapNumber:      lap.LapNumber,
+		SectorDuration: lap.SectorDuration,
+		InfoTime:       pgtype.Timestamptz{Time: lap.InfoTime, Valid: true},
 	}
 }

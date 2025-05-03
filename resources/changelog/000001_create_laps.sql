@@ -12,9 +12,7 @@ create table if not exists laps(
     lap_duration double precision not null,
     lap_number integer not null,
     sector_duration double precision[3] not null,
-    info_time timestamptz not null,
-    created_at timestamptz not null,
-    updated_at timestamptz not null
+    info_time timestamptz not null
 );
 
 -- +goose StatementEnd
