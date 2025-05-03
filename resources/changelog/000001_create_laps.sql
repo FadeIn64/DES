@@ -5,22 +5,16 @@ create sequence if not exists laps_seq
 
 create table if not exists laps(
     id  bigint default  nextval('laps_seq'::regclass) not null primary key,
-    meeting_key INT NOT NULL,
-    session_key INT NOT NULL,
-    driver_number INT,
-    i1_speed INT,
-    i2_speed INT,
-    st_speed INT,
-    date_start timestamp,
-    lap_duration FLOAT,
-    is_pit_out_lap BOOLEAN,
-    duration_sector_1 FLOAT,
-    duration_sector_2 FLOAT,
-    duration_sector_3 FLOAT,
-    segments_sector_1 INT[],
-    segments_sector_2 INT[],
-    segments_sector_3 INT[],
-    lap_number INT NOT NULL
+    meeting_key integer not null,
+    session_key integer not null,
+    driver_number integer not null,
+    date_start timestamptz not null,
+    lap_duration double precision not null,
+    lap_number integer not null,
+    sector_duration double precision[3] not null,
+    info_time timestamptz not null,
+    created_at timestamptz not null,
+    updated_at timestamptz not null
 );
 
 -- +goose StatementEnd
