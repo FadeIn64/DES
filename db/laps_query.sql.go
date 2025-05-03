@@ -12,7 +12,7 @@ import (
 )
 
 const getLapsStartDateBetween = `-- name: GetLapsStartDateBetween :many
-select id, meeting_key, session_key, driver_number, date_start, lap_duration, lap_number, sector_duration, info_time
+select id, meeting_key, session_key, driver_number, date_start, lap_duration, lap_number, sector_duration, info_time, is_pit_out_lap
 from laps
 where info_time >= $1
   and info_time <= $2
@@ -42,6 +42,7 @@ func (q *Queries) GetLapsStartDateBetween(ctx context.Context, arg GetLapsStartD
 			&i.LapNumber,
 			&i.SectorDuration,
 			&i.InfoTime,
+			&i.IsPitOutLap,
 		); err != nil {
 			return nil, err
 		}
@@ -54,8 +55,8 @@ func (q *Queries) GetLapsStartDateBetween(ctx context.Context, arg GetLapsStartD
 }
 
 const insertLap = `-- name: InsertLap :exec
-insert into laps(meeting_key, session_key, driver_number, date_start, lap_duration, lap_number, sector_duration, info_time)
-values ($1, $2, $3,$4, $5, $6,$7, $8)
+insert into laps(meeting_key, session_key, driver_number, date_start, lap_duration, lap_number, sector_duration, info_time, is_pit_out_lap)
+values ($1, $2, $3,$4, $5, $6,$7, $8, $9)
 `
 
 type InsertLapParams struct {
@@ -67,6 +68,7 @@ type InsertLapParams struct {
 	LapNumber      int32
 	SectorDuration []float64
 	InfoTime       pgtype.Timestamptz
+	IsPitOutLap    bool
 }
 
 func (q *Queries) InsertLap(ctx context.Context, arg InsertLapParams) error {
@@ -79,6 +81,7 @@ func (q *Queries) InsertLap(ctx context.Context, arg InsertLapParams) error {
 		arg.LapNumber,
 		arg.SectorDuration,
 		arg.InfoTime,
+		arg.IsPitOutLap,
 	)
 	return err
 }

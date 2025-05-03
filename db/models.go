@@ -18,4 +18,5 @@ type Lap struct {
 	LapNumber      int32
 	SectorDuration []float64
 	InfoTime       pgtype.Timestamptz
+	IsPitOutLap    bool
 }

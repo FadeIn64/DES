@@ -14,6 +14,7 @@ func F1LapToSectorLapsWithTiming(f1Lap F1Lap) []Lap {
 			LapNumber:      f1Lap.LapNumber,
 			SectorDuration: []float64{f1Lap.DurationSector1, 0, 0},
 			InfoTime:       f1Lap.DateStart.Add(time.Duration(f1Lap.DurationSector1 * float64(time.Second))),
+			IsPitOutLap:    f1Lap.IsPitOutLap,
 		},
 		// 2-я структура: Sector 1 + Sector 2
 		{
@@ -25,6 +26,7 @@ func F1LapToSectorLapsWithTiming(f1Lap F1Lap) []Lap {
 			LapNumber:      f1Lap.LapNumber,
 			SectorDuration: []float64{f1Lap.DurationSector1, f1Lap.DurationSector2, 0},
 			InfoTime:       f1Lap.DateStart.Add(time.Duration((f1Lap.DurationSector1 + f1Lap.DurationSector2) * float64(time.Second))),
+			IsPitOutLap:    f1Lap.IsPitOutLap,
 		},
 		// 3-я структура: все три сектора
 		{
@@ -36,6 +38,7 @@ func F1LapToSectorLapsWithTiming(f1Lap F1Lap) []Lap {
 			LapNumber:      f1Lap.LapNumber,
 			SectorDuration: []float64{f1Lap.DurationSector1, f1Lap.DurationSector2, f1Lap.DurationSector3},
 			InfoTime:       f1Lap.DateStart.Add(time.Duration((f1Lap.DurationSector1 + f1Lap.DurationSector2 + f1Lap.DurationSector3) * float64(time.Second))),
+			IsPitOutLap:    f1Lap.IsPitOutLap,
 		},
 	}
 }

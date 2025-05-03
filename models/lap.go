@@ -30,4 +30,5 @@ type Lap struct {
 	LapNumber      int32     `json:"lap_number"`
 	SectorDuration []float64 `json:"sector_duration"`
 	InfoTime       time.Time `json:"info_time"`
+	IsPitOutLap    bool      `json:"is_pit_out_lap"`
 }

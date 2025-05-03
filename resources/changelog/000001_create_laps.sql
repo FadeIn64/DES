@@ -12,7 +12,8 @@ create table if not exists laps(
     lap_duration double precision not null,
     lap_number integer not null,
     sector_duration double precision[3] not null,
-    info_time timestamptz not null
+    info_time timestamptz not null,
+    is_pit_out_lap bool not null 
 );
 
 -- +goose StatementEnd

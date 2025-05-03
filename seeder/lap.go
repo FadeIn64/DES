@@ -45,5 +45,6 @@ func convertLapToInsert(lap *models.Lap) *db.InsertLapParams {
 		LapNumber:      lap.LapNumber,
 		SectorDuration: lap.SectorDuration,
 		InfoTime:       pgtype.Timestamptz{Time: lap.InfoTime, Valid: true},
+		IsPitOutLap:    lap.IsPitOutLap,
 	}
 }
