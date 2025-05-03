@@ -104,7 +104,7 @@ func receiveLaps(ctx context.Context, LapExtractor extractors.LapExtractor) {
 
 			toRaceTime := fromRaceTime.Add(diff)
 
-			laps, err := extractor.ExtractLap(ctx, fromRaceTime, toRaceTime)
+			laps, err := extractor.ExtractLaps(ctx, fromRaceTime, toRaceTime)
 			if err != nil {
 				log.Fatal(err)
 			}

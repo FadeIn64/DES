@@ -10,7 +10,7 @@ import (
 )
 
 type LapExtractor interface {
-	ExtractLap(ctx context.Context, from time.Time, to time.Time) ([]models.F1Lap, error)
+	ExtractLaps(ctx context.Context, from time.Time, to time.Time) ([]models.F1Lap, error)
 }
 
 func NewLapExtractor(pool *pgxpool.Pool) LapExtractor {
@@ -21,7 +21,7 @@ type lapExtractor struct {
 	pool *pgxpool.Pool
 }
 
-func (l *lapExtractor) ExtractLap(ctx context.Context, from time.Time, to time.Time) ([]models.F1Lap, error) {
+func (l *lapExtractor) ExtractLaps(ctx context.Context, from time.Time, to time.Time) ([]models.F1Lap, error) {
 
 	q := db.New(l.pool)
 
