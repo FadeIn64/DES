@@ -1,9 +1,7 @@
 package main
 
 import (
-	"DAS/internal/repositories/db"
 	"context"
-	"encoding/json"
 	"log"
 	"os"
 	"os/signal"
@@ -15,33 +13,10 @@ import (
 	"DAS/internal/app"
 )
 
-type KafkaConsumer struct {
-	app *app.App
-}
-
-func (kc *KafkaConsumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
-	ctx := context.Background()
-
-	for message := range claim.Messages() {
-		var lap db.Lap
-		if err := json.Unmarshal(message.Value, &lap); err != nil {
-			log.Printf("Error unmarshaling message: %v\n", err)
-			continue
-		}
-
-		if err := kc.app.Repo.ProcessLap(ctx, lap); err != nil {
-			log.Printf("Error processing lap: %v\n", err)
-		}
-
-		session.MarkMessage(message, "")
-	}
-	return nil
-}
-
 func main() {
 	cfg := &config.Config{
-		KafkaBrokers: []string{"localhost:9093"},
-		KafkaTopic:   "race-laps",
+		KafkaBrokers: []string{"localhost:9092"},
+		KafkaTopic:   "laps",
 		KafkaGroupID: "lap-aggregator-group",
 		PGConnString: "postgres://username:password@localhost/das?sslmode=disable",
 		SectorsCount: 3,
@@ -50,10 +25,10 @@ func main() {
 	application := app.NewApp(cfg)
 	defer application.Close()
 
-	//consumer := setupKafkaConsumer(cfg)
-	//defer consumer.Close()
+	consumer := setupKafkaConsumer(cfg)
+	defer consumer.Close()
 
-	//go runConsumer(context.Background(), consumer, &KafkaConsumer{app: application})
+	go runConsumer(context.Background(), consumer, application.LapHandler)
 
 	waitForShutdown()
 }

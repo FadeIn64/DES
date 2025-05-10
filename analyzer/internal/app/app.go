@@ -1,6 +1,7 @@
 package app
 
 import (
+	"DAS/internal/consumers"
 	"context"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
@@ -16,16 +17,18 @@ import (
 )
 
 type App struct {
-	cfg       *config.Config
-	pool      *pgxpool.Pool
-	trManager trm.Manager
-	Repo      *repositories.LapRepository
+	cfg        *config.Config
+	pool       *pgxpool.Pool
+	trManager  trm.Manager
+	Repo       *repositories.LapRepository
+	LapHandler *consumers.LapHandler
 }
 
 func NewApp(cfg *config.Config) *App {
 	pool := initDBPool(cfg)
 	trManager := initTransactionManager(pool)
 	repo := repositories.NewLapRepository(pool, trManager)
+	lapHandler := consumers.NewLapHandler(repo)
 
 	db := stdlib.OpenDBFromPool(pool)
 
@@ -39,10 +42,11 @@ func NewApp(cfg *config.Config) *App {
 	}
 
 	return &App{
-		cfg:       cfg,
-		pool:      pool,
-		trManager: trManager,
-		Repo:      repo,
+		cfg:        cfg,
+		pool:       pool,
+		trManager:  trManager,
+		Repo:       repo,
+		LapHandler: lapHandler,
 	}
 }
 
