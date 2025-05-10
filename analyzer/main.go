@@ -1,4 +1,4 @@
-package analyzer
+package main
 
 import (
 	"DAS/internal/repositories/db"
@@ -43,15 +43,15 @@ func main() {
 		KafkaBrokers: []string{"localhost:9092"},
 		KafkaTopic:   "race-laps",
 		KafkaGroupID: "lap-aggregator-group",
-		PGConnString: "postgres://user:password@localhost/f1db?sslmode=disable",
+		PGConnString: "postgres://username:password@localhost/das?sslmode=disable",
 		SectorsCount: 3,
 	}
 
 	application := app.NewApp(cfg)
 	defer application.Close()
 
-	consumer := setupKafkaConsumer(cfg)
-	defer consumer.Close()
+	//consumer := setupKafkaConsumer(cfg)
+	//defer consumer.Close()
 
 	//go runConsumer(context.Background(), consumer, &KafkaConsumer{app: application})
 
@@ -89,5 +89,5 @@ func waitForShutdown() {
 	sigterm := make(chan os.Signal, 1)
 	signal.Notify(sigterm, syscall.SIGINT, syscall.SIGTERM)
 	<-sigterm
-	log.Println("Received termination signal, initiating shutdown...")
+	log.Println("Received termination signal, initiating shutdown... ", sigterm)
 }

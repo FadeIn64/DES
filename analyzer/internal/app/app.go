@@ -2,6 +2,8 @@ package app
 
 import (
 	"context"
+	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose/v3"
 	"log"
 
 	trmpgx "github.com/avito-tech/go-transaction-manager/pgxv5"
@@ -24,6 +26,17 @@ func NewApp(cfg *config.Config) *App {
 	pool := initDBPool(cfg)
 	trManager := initTransactionManager(pool)
 	repo := repositories.NewLapRepository(pool, trManager)
+
+	db := stdlib.OpenDBFromPool(pool)
+
+	err := goose.SetDialect("postgres")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = goose.Up(db, "migrations")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return &App{
 		cfg:       cfg,
