@@ -6,7 +6,7 @@ import (
 	"github.com/avito-tech/go-transaction-manager/trm/v2/settings"
 )
 
-type App struct {
+type Config struct {
 	KafkaBrokers []string
 	KafkaTopic   string
 	KafkaGroupID string
@@ -14,7 +14,7 @@ type App struct {
 	SectorsCount int
 }
 
-func (a *App) TransactionSettings() settings.Settings {
+func (a *Config) TransactionSettings() settings.Settings {
 	return settings.Must(
 		settings.WithTimeout(time.Second * 5),
 	)

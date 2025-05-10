@@ -13,19 +13,19 @@ import (
 	"DAS/internal/repositories"
 )
 
-type FullApp struct {
-	cfg       *config.App
+type App struct {
+	cfg       *config.Config
 	pool      *pgxpool.Pool
 	trManager trm.Manager
 	repo      *repositories.LapRepository
 }
 
-func NewApp(cfg *config.App) *FullApp {
+func NewApp(cfg *config.Config) *App {
 	pool := initDBPool(cfg)
 	trManager := initTransactionManager(pool)
 	repo := repositories.NewLapRepository(pool, trManager)
 
-	return &FullApp{
+	return &App{
 		cfg:       cfg,
 		pool:      pool,
 		trManager: trManager,
@@ -33,7 +33,7 @@ func NewApp(cfg *config.App) *FullApp {
 	}
 }
 
-func initDBPool(cfg *config.App) *pgxpool.Pool {
+func initDBPool(cfg *config.Config) *pgxpool.Pool {
 	poolConfig, err := pgxpool.ParseConfig(cfg.PGConnString)
 	if err != nil {
 		log.Fatalf("Unable to parse pool config: %v", err)
@@ -57,6 +57,6 @@ func initTransactionManager(pool *pgxpool.Pool) trm.Manager {
 	)
 }
 
-func (a *FullApp) Close() {
+func (a *App) Close() {
 	a.pool.Close()
 }
