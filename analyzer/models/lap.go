@@ -21,4 +21,5 @@ type LapAnalysis struct {
 	AverageSegmentPace float64
 	LapsInSegment      int
 	ComparisonWithAvg  float64 // Разница текущего круга со средним (%)
+	PositionTrend      string  // Тренд позиции ("improving", "stable", "declining")
 }

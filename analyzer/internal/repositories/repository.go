@@ -99,10 +99,32 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 			analysis.ComparisonWithAvg = (analysis.CurrentLapTime - analysis.AverageLapTime) / analysis.AverageLapTime * 100
 		}
 
+		// 6. Определяем тренд
+		analysis.PositionTrend = r.calculateTrend(
+			analysis.CurrentLapTime,
+			analysis.AverageSegmentPace,
+		)
+
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &analysis, nil
+}
+
+func (r *LapRepository) calculateTrend(current, average float64) string {
+	if average == 0 {
+		return "stable"
+	}
+
+	ratio := (current - average) / average
+	switch {
+	case ratio < -0.03: // >3% лучше
+		return "improving"
+	case ratio > 0.03: // >3% хуже
+		return "declining"
+	default:
+		return "stable"
+	}
 }

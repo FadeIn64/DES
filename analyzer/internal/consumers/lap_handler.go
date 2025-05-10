@@ -42,10 +42,11 @@ func (h *LapHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sar
 		}
 
 		log.Printf(
-			"Lap analysis: Current=%.3fs, Avg=%.3fs(%.1f%%), SegmentAvg=%.3fs(%d laps)\n",
+			"Driver %d: Lap=%.3fs (Avg=%.3fs, Trend=%s) | Segment: %.3fs (%d laps)\n",
+			analysis.DriverNumber,
 			analysis.CurrentLapTime,
 			analysis.AverageLapTime,
-			analysis.ComparisonWithAvg,
+			analysis.PositionTrend,
 			analysis.AverageSegmentPace,
 			analysis.LapsInSegment,
 		)
