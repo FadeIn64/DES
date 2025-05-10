@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var lapsPath = "./resources/laps_data"
+var lapsPath = "./extractor/resources/laps_data"
 
 func ReadLapsData() ([]models.F1Lap, error) {
 
