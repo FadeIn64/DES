@@ -12,6 +12,7 @@ type Config struct {
 	KafkaGroupID string
 	PGConnString string
 	SectorsCount int
+	ServerPort   string
 }
 
 func (a *Config) TransactionSettings() settings.Settings {

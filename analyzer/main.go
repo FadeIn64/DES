@@ -2,7 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -20,6 +24,7 @@ func main() {
 		KafkaGroupID: "lap-aggregator-group",
 		PGConnString: "postgres://username:password@localhost/das?sslmode=disable",
 		SectorsCount: 3,
+		ServerPort:   "2112",
 	}
 
 	application := app.NewApp(cfg)
@@ -27,6 +32,17 @@ func main() {
 
 	consumer := setupKafkaConsumer(cfg)
 	defer consumer.Close()
+
+	prometheus.MustRegister(application.Exporter)
+
+	// HTTP endpoint для Prometheus
+	http.Handle("/metrics", promhttp.Handler())
+	go func() {
+		log.Printf("Starting metrics server at :%s", application.Cfg.ServerPort)
+		if err := http.ListenAndServe(fmt.Sprintf(":%s", application.Cfg.ServerPort), nil); err != nil {
+			log.Fatalf("Failed to start metrics server: %v", err)
+		}
+	}()
 
 	go runConsumer(context.Background(), consumer, application.LapHandler, application)
 
