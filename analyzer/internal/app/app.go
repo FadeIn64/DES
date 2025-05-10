@@ -17,7 +17,7 @@ import (
 )
 
 type App struct {
-	cfg        *config.Config
+	Cfg        *config.Config
 	pool       *pgxpool.Pool
 	trManager  trm.Manager
 	Repo       *repositories.LapRepository
@@ -42,7 +42,7 @@ func NewApp(cfg *config.Config) *App {
 	}
 
 	return &App{
-		cfg:        cfg,
+		Cfg:        cfg,
 		pool:       pool,
 		trManager:  trManager,
 		Repo:       repo,

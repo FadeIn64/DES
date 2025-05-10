@@ -28,7 +28,7 @@ func main() {
 	consumer := setupKafkaConsumer(cfg)
 	defer consumer.Close()
 
-	go runConsumer(context.Background(), consumer, application.LapHandler)
+	go runConsumer(context.Background(), consumer, application.LapHandler, application)
 
 	waitForShutdown()
 }
@@ -49,9 +49,9 @@ func setupKafkaConsumer(cfg *config.Config) sarama.ConsumerGroup {
 	return consumer
 }
 
-func runConsumer(ctx context.Context, consumer sarama.ConsumerGroup, handler sarama.ConsumerGroupHandler) {
+func runConsumer(ctx context.Context, consumer sarama.ConsumerGroup, handler sarama.ConsumerGroupHandler, app *app.App) {
 	for {
-		if err := consumer.Consume(ctx, []string{"race-laps"}, handler); err != nil {
+		if err := consumer.Consume(ctx, []string{app.Cfg.KafkaTopic}, handler); err != nil {
 			log.Printf("Error from consumer: %v", err)
 		}
 		if ctx.Err() != nil {
