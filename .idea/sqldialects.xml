@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/analyzer/internal/repositories/queries/laps.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/extractor/db/sql/laps_query.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/extractor/resources/changelog/000001_create_laps.sql" dialect="PostgreSQL" />
   </component>

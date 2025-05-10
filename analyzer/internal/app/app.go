@@ -17,7 +17,7 @@ type App struct {
 	cfg       *config.Config
 	pool      *pgxpool.Pool
 	trManager trm.Manager
-	repo      *repositories.LapRepository
+	Repo      *repositories.LapRepository
 }
 
 func NewApp(cfg *config.Config) *App {
@@ -29,7 +29,7 @@ func NewApp(cfg *config.Config) *App {
 		cfg:       cfg,
 		pool:      pool,
 		trManager: trManager,
-		repo:      repo,
+		Repo:      repo,
 	}
 }
 
