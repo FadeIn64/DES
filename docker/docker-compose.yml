@@ -33,10 +33,35 @@ services:
       - db-data:/var/lib/postgresql/data
       - ./db/:/docker-entrypoint-initdb.d/
     restart: unless-stopped
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - .prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - my_net
 
+  grafana:
+    image: grafana/grafana-enterprise
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    depends_on:
+      - prometheus
+    networks:
+      - my_net
 
 volumes:
   db-data:
+  grafana_data:
 
 networks:
   my_net:

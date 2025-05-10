@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'analyze-service'
+    static_configs:
+      - targets: ['127.0.0.1:2112']
+    metrics_path: '/metrics'
+
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
