@@ -30,8 +30,8 @@ func NewApp(cfg *config.Config) *App {
 	pool := initDBPool(cfg)
 	trManager := initTransactionManager(pool)
 	repo := repositories.NewLapRepository(pool, trManager)
-	lapHandler := consumers.NewLapHandler(repo)
 	exporter := metrics.NewMetricsExporter()
+	lapHandler := consumers.NewLapHandler(repo, exporter)
 
 	db := stdlib.OpenDBFromPool(pool)
 

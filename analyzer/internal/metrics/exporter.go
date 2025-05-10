@@ -9,7 +9,7 @@ import (
 )
 
 type Exporter struct {
-	mu sync.Mutex
+	mu *sync.Mutex
 
 	// Основные метрики
 	currentLapTime *prometheus.GaugeVec
@@ -66,6 +66,7 @@ func NewMetricsExporter() *Exporter {
 			},
 			[]string{"driver_number"},
 		),
+		mu: &sync.Mutex{},
 	}
 }
 
@@ -98,21 +99,22 @@ func (e *Exporter) UpdateMetrics(analysis *models.LapAnalysis) {
 
 	if analysis.CurrentLapTime != 0 {
 		e.currentLapTime.WithLabelValues(driverLabel).Set(analysis.CurrentLapTime)
+		e.lapDeviation.WithLabelValues(driverLabel).Set(analysis.ComparisonWithAvg)
+
+		// Кодируем тренд в числовое значение
+		var trendValue float64
+		switch analysis.PositionTrend {
+		case "improving":
+			trendValue = 1
+		case "declining":
+			trendValue = -1
+		default:
+			trendValue = 0
+		}
+		e.trendDirection.WithLabelValues(driverLabel).Set(trendValue)
 	}
 	e.avgLapTime.WithLabelValues(driverLabel).Set(analysis.AverageLapTime)
 	e.segmentPace.WithLabelValues(driverLabel, "current").Set(analysis.AverageSegmentPace)
 	e.lapsInSegment.WithLabelValues(driverLabel).Set(float64(analysis.LapsInSegment))
-	e.lapDeviation.WithLabelValues(driverLabel).Set(analysis.ComparisonWithAvg)
 
-	// Кодируем тренд в числовое значение
-	var trendValue float64
-	switch analysis.PositionTrend {
-	case "improving":
-		trendValue = 1
-	case "declining":
-		trendValue = -1
-	default:
-		trendValue = 0
-	}
-	e.trendDirection.WithLabelValues(driverLabel).Set(trendValue)
 }

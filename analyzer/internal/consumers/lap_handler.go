@@ -15,8 +15,8 @@ type LapHandler struct {
 	exporter *metrics.Exporter
 }
 
-func NewLapHandler(repo *repositories.LapRepository) *LapHandler {
-	return &LapHandler{repo: repo}
+func NewLapHandler(repo *repositories.LapRepository, exporter *metrics.Exporter) *LapHandler {
+	return &LapHandler{repo: repo, exporter: exporter}
 }
 
 func (h *LapHandler) Setup(sarama.ConsumerGroupSession) error {
