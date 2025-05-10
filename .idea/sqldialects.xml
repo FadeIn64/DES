@@ -3,6 +3,7 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/analyzer/internal/repositories/queries/laps.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/analyzer/migrations/000001_init_schema.up.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/analyzer/migrations/000002_analysis_functions.up.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/extractor/db/sql/laps_query.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/extractor/resources/changelog/000001_create_laps.sql" dialect="PostgreSQL" />
   </component>
