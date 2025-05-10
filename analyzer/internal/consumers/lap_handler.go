@@ -1,11 +1,11 @@
 package consumers
 
 import (
+	"DAS/models"
 	"encoding/json"
 	"log"
 
 	"DAS/internal/repositories"
-	"DAS/internal/repositories/db"
 	"github.com/IBM/sarama"
 )
 
@@ -29,7 +29,7 @@ func (h *LapHandler) Cleanup(sarama.ConsumerGroupSession) error {
 
 func (h *LapHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for message := range claim.Messages() {
-		var lap db.Lap
+		var lap models.Lap
 		if err := json.Unmarshal(message.Value, &lap); err != nil {
 			log.Printf("Error unmarshaling message: %v\n", err)
 			continue
