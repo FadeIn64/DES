@@ -16,7 +16,7 @@ ON CONFLICT (driver_number, lap_number)
                   session_key = EXCLUDED.session_key,
                   date_start = EXCLUDED.date_start,
                   lap_duration = COALESCE(NULLIF(EXCLUDED.lap_duration, 0), laps.lap_duration),
-                  sector_duration = array_merge_non_null(laps.sector_duration, EXCLUDED.sector_duration),
+                  sector_duration = EXCLUDED.sector_duration,
                   info_time = GREATEST(EXCLUDED.info_time, laps.info_time),
                   is_pit_out_lap = EXCLUDED.is_pit_out_lap,
                   updated_at = NOW();
