@@ -9,6 +9,8 @@ import (
 )
 
 type Querier interface {
+	GetAverageLapTime(ctx context.Context, arg GetAverageLapTimeParams) (float64, error)
+	GetCurrentSegmentPace(ctx context.Context, arg GetCurrentSegmentPaceParams) (GetCurrentSegmentPaceRow, error)
 	GetLap(ctx context.Context, arg GetLapParams) (Lap, error)
 	MoveCompleteLap(ctx context.Context, arg MoveCompleteLapParams) error
 	UpsertLap(ctx context.Context, arg UpsertLapParams) error

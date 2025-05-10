@@ -11,6 +11,69 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getAverageLapTime = `-- name: GetAverageLapTime :one
+SELECT AVG(lap_duration)::float8
+FROM laps
+WHERE driver_number = $1
+  AND is_pit_out_lap = $2
+  AND lap_duration > 0
+`
+
+type GetAverageLapTimeParams struct {
+	DriverNumber int32
+	IsPitOutLap  bool
+}
+
+func (q *Queries) GetAverageLapTime(ctx context.Context, arg GetAverageLapTimeParams) (float64, error) {
+	row := q.db.QueryRow(ctx, getAverageLapTime, arg.DriverNumber, arg.IsPitOutLap)
+	var column_1 float64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
+const getCurrentSegmentPace = `-- name: GetCurrentSegmentPace :one
+WITH segment AS (
+    SELECT lap_number, lap_duration
+    FROM laps l
+    WHERE l.driver_number = $1
+      AND l.lap_number <= $2
+      AND l.is_pit_out_lap = false
+      AND l.lap_duration > 0
+    ORDER BY l.lap_number DESC
+    LIMIT (
+        SELECT COALESCE(
+                       (SELECT MIN(l2.lap_number)
+                        FROM laps l2
+                        WHERE l2.driver_number = $1
+                          AND l2.lap_number <= $2
+                          AND l2.is_pit_out_lap = true),
+                       $2
+               )
+        )
+    )
+    SELECT
+        AVG(lap_duration)::float8 as average_pace,
+        COUNT(*) as lap_count
+    FROM segment
+`
+
+type GetCurrentSegmentPaceParams struct {
+	DriverNumber int32
+	LapNumber    int32
+}
+
+type GetCurrentSegmentPaceRow struct {
+	AveragePace float64
+	LapCount    int64
+}
+
+func (q *Queries) GetCurrentSegmentPace(ctx context.Context, arg GetCurrentSegmentPaceParams) (GetCurrentSegmentPaceRow, error) {
+	row := q.db.QueryRow(ctx, getCurrentSegmentPace, arg.DriverNumber, arg.LapNumber)
+	var i GetCurrentSegmentPaceRow
+	err := row.Scan(&i.AveragePace, &i.LapCount)
+	return i, err
+}
+
 const getLap = `-- name: GetLap :one
 SELECT meeting_key, session_key, driver_number, date_start, lap_duration, lap_number, sector_duration, info_time, is_pit_out_lap, updated_at FROM laps
 WHERE driver_number = $1 AND lap_number = $2

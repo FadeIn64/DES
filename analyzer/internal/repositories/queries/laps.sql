@@ -2,6 +2,38 @@
 SELECT * FROM laps
 WHERE driver_number = $1 AND lap_number = $2;
 
+-- name: GetAverageLapTime :one
+SELECT AVG(lap_duration)::float8
+FROM laps
+WHERE driver_number = $1
+  AND is_pit_out_lap = $2
+  AND lap_duration > 0;
+
+-- name: GetCurrentSegmentPace :one
+WITH segment AS (
+    SELECT lap_number, lap_duration
+    FROM laps l
+    WHERE l.driver_number = $1
+      AND l.lap_number <= $2
+      AND l.is_pit_out_lap = false
+      AND l.lap_duration > 0
+    ORDER BY l.lap_number DESC
+    LIMIT (
+        SELECT COALESCE(
+                       (SELECT MIN(l2.lap_number)
+                        FROM laps l2
+                        WHERE l2.driver_number = $1
+                          AND l2.lap_number <= $2
+                          AND l2.is_pit_out_lap = true),
+                       $2
+               )
+        )
+    )
+    SELECT
+        AVG(lap_duration)::float8 as average_pace,
+        COUNT(*) as lap_count
+    FROM segment;
+
 -- name: UpsertLap :exec
 INSERT INTO laps (
     meeting_key, session_key, driver_number,
