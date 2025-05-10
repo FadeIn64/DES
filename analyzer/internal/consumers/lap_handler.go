@@ -1,6 +1,7 @@
 package consumers
 
 import (
+	"DAS/internal/metrics"
 	"DAS/models"
 	"encoding/json"
 	"log"
@@ -10,7 +11,8 @@ import (
 )
 
 type LapHandler struct {
-	repo *repositories.LapRepository
+	repo     *repositories.LapRepository
+	exporter *metrics.Exporter
 }
 
 func NewLapHandler(repo *repositories.LapRepository) *LapHandler {
@@ -39,6 +41,7 @@ func (h *LapHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sar
 		if err != nil || analysis == nil {
 			log.Printf("Error processing lap: %v\n", err)
 			session.MarkMessage(message, "")
+			continue
 		}
 
 		log.Printf(
@@ -50,6 +53,8 @@ func (h *LapHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sar
 			analysis.AverageSegmentPace,
 			analysis.LapsInSegment,
 		)
+
+		h.exporter.UpdateMetrics(analysis)
 
 		session.MarkMessage(message, "")
 	}
