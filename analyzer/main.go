@@ -40,7 +40,7 @@ func (kc *KafkaConsumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim
 
 func main() {
 	cfg := &config.Config{
-		KafkaBrokers: []string{"localhost:9092"},
+		KafkaBrokers: []string{"localhost:9093"},
 		KafkaTopic:   "race-laps",
 		KafkaGroupID: "lap-aggregator-group",
 		PGConnString: "postgres://username:password@localhost/das?sslmode=disable",
