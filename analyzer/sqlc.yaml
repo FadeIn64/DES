@@ -1,15 +1,13 @@
 version: "2"
 sql:
   - schema: "migrations"
-    queries: "internal/repository/queries/"
-    engine: "pgx/v5"
+    queries: "internal/repositories/queries/"
+    engine: "postgresql"
     gen:
       go:
         package: "db"
-        out: "internal/repository/db"
+        out: "internal/repositories/db"
         sql_package: "pgx/v5"
         emit_interface: true
-        emit_params_structs: true
-        emit_result_structs: true
         emit_methods_with_db_argument: false
         emit_prepared_queries: true

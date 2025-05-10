@@ -1,7 +1,6 @@
 -- name: GetLap :one
 SELECT * FROM laps
-WHERE driver_number = $1 AND lap_number = $2
-    FOR UPDATE;
+WHERE driver_number = $1 AND lap_number = $2;
 
 -- name: UpsertLap :exec
 INSERT INTO laps (
@@ -24,6 +23,6 @@ ON CONFLICT (driver_number, lap_number)
 
 -- name: MoveCompleteLap :exec
 INSERT INTO complete_laps
-SELECT * FROM laps
-WHERE driver_number = $1 AND lap_number = $2 AND lap_duration > 0
+SELECT * FROM laps l
+WHERE l.driver_number = $1 AND l.lap_number = $2 AND l.lap_duration > 0
 ON CONFLICT (driver_number, lap_number) DO NOTHING;
