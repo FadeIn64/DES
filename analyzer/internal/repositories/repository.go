@@ -11,6 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"log"
 )
 
 type LapRepository struct {
@@ -28,6 +29,8 @@ func NewLapRepository(db *pgxpool.Pool, manager trm.Manager) *LapRepository {
 func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) error {
 	return r.manager.Do(ctx, func(ctx context.Context) error {
 		q := db.New(trmpgx.DefaultCtxGetter.DefaultTrOrDB(ctx, r.db))
+
+		log.Printf("processing lap %+v", lap)
 
 		// 1. Проверяем существование записи
 		_, err := q.GetLap(ctx, db.GetLapParams{
