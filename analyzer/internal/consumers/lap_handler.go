@@ -35,9 +35,20 @@ func (h *LapHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sar
 			continue
 		}
 
-		if err := h.repo.ProcessLap(session.Context(), lap); err != nil {
+		analysis, err := h.repo.ProcessLap(session.Context(), lap)
+		if err != nil || analysis == nil {
 			log.Printf("Error processing lap: %v\n", err)
+			session.MarkMessage(message, "")
 		}
+
+		log.Printf(
+			"Lap analysis: Current=%.3fs, Avg=%.3fs(%.1f%%), SegmentAvg=%.3fs(%d laps)\n",
+			analysis.CurrentLapTime,
+			analysis.AverageLapTime,
+			analysis.ComparisonWithAvg,
+			analysis.AverageSegmentPace,
+			analysis.LapsInSegment,
+		)
 
 		session.MarkMessage(message, "")
 	}

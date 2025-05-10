@@ -11,7 +11,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"log"
 )
 
 type LapRepository struct {
@@ -26,11 +25,11 @@ func NewLapRepository(db *pgxpool.Pool, manager trm.Manager) *LapRepository {
 	}
 }
 
-func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) error {
-	return r.manager.Do(ctx, func(ctx context.Context) error {
-		q := db.New(trmpgx.DefaultCtxGetter.DefaultTrOrDB(ctx, r.db))
+func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models.LapAnalysis, error) {
+	var analysis models.LapAnalysis
 
-		log.Printf("processing lap %+v", lap)
+	err := r.manager.Do(ctx, func(ctx context.Context) error {
+		q := db.New(trmpgx.DefaultCtxGetter.DefaultTrOrDB(ctx, r.db))
 
 		// 1. Проверяем существование записи
 		_, err := q.GetLap(ctx, db.GetLapParams{
@@ -66,6 +65,44 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) error {
 			}
 		}
 
+		// 2. Если это пит-стоп, завершаем обработку
+		if lap.IsPitOutLap {
+			return nil
+		}
+
+		analysis.DriverNumber = lap.DriverNumber
+		analysis.CurrentLapTime = lap.LapDuration
+
+		// 3. Рассчитываем среднее время круга (исключая пит-стопы)
+		analysis.AverageLapTime, err = q.GetAverageLapTime(ctx, db.GetAverageLapTimeParams{
+			DriverNumber: lap.DriverNumber,
+			IsPitOutLap:  false,
+		})
+		if err != nil {
+			return fmt.Errorf("get average lap time: %w", err)
+		}
+
+		// 4. Рассчитываем средний темп на текущем сегменте
+		segment, err := q.GetCurrentSegmentPace(ctx, db.GetCurrentSegmentPaceParams{
+			DriverNumber: lap.DriverNumber,
+			LapNumber:    lap.LapNumber,
+		})
+		if err != nil {
+			return fmt.Errorf("get segment pace: %w", err)
+		}
+
+		analysis.AverageSegmentPace = segment.AveragePace
+		analysis.LapsInSegment = int(segment.LapCount)
+
+		// 5. Сравнение текущего круга со средним
+		if analysis.AverageLapTime > 0 {
+			analysis.ComparisonWithAvg = (analysis.CurrentLapTime - analysis.AverageLapTime) / analysis.AverageLapTime * 100
+		}
+
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
+	return &analysis, nil
 }

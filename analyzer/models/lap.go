@@ -13,3 +13,12 @@ type Lap struct {
 	InfoTime       time.Time `json:"info_time"`
 	IsPitOutLap    bool      `json:"is_pit_out_lap"`
 }
+
+type LapAnalysis struct {
+	DriverNumber       int32
+	CurrentLapTime     float64
+	AverageLapTime     float64
+	AverageSegmentPace float64
+	LapsInSegment      int
+	ComparisonWithAvg  float64 // Разница текущего круга со средним (%)
+}
