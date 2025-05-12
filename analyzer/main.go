@@ -36,7 +36,7 @@ func main() {
 	prometheus.MustRegister(application.Exporter)
 
 	// HTTP endpoint для Prometheus
-	http.Handle("/metrics", promhttp.Handler())
+	http.Handle("/metrics", &metricsHandler{pronH: promhttp.Handler()})
 	go func() {
 		log.Printf("Starting metrics server at :%s", application.Cfg.ServerPort)
 		if err := http.ListenAndServe(fmt.Sprintf(":%s", application.Cfg.ServerPort), nil); err != nil {
@@ -81,4 +81,13 @@ func waitForShutdown() {
 	signal.Notify(sigterm, syscall.SIGINT, syscall.SIGTERM)
 	<-sigterm
 	log.Println("Received termination signal, initiating shutdown... ", sigterm)
+}
+
+type metricsHandler struct {
+	pronH http.Handler
+}
+
+func (h metricsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Serving metrics at %s", r.URL.Path)
+	h.pronH.ServeHTTP(w, r)
 }
