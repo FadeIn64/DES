@@ -26,42 +26,42 @@ func NewMetricsExporter() *Exporter {
 	return &Exporter{
 		currentLapTime: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "f1_current_lap_time_seconds",
+				Name: "current_lap_time_seconds",
 				Help: "Current lap time by driver",
 			},
 			[]string{"driver_number"},
 		),
 		avgLapTime: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "f1_avg_lap_time_seconds",
+				Name: "avg_lap_time_seconds",
 				Help: "Average lap time by driver (excluding pit stops)",
 			},
 			[]string{"driver_number"},
 		),
 		segmentPace: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "f1_segment_pace_seconds",
+				Name: "segment_pace_seconds",
 				Help: "Current segment pace by driver",
 			},
 			[]string{"driver_number", "segment_type"},
 		),
 		lapsInSegment: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "f1_laps_in_segment_count",
+				Name: "laps_in_segment_count",
 				Help: "Number of laps in current segment",
 			},
 			[]string{"driver_number"},
 		),
 		trendDirection: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "f1_lap_trend_direction",
+				Name: "lap_trend_direction",
 				Help: "Lap trend direction (1=improving, 0=stable, -1=declining)",
 			},
 			[]string{"driver_number"},
 		),
 		lapDeviation: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "f1_lap_deviation_percent",
+				Name: "lap_deviation_percent",
 				Help: "Percentage deviation from average lap time",
 			},
 			[]string{"driver_number"},

@@ -102,7 +102,7 @@
         {
           "datasource": "Prometheus",
           "editorMode": "code",
-          "expr": "avg(f1_avg_lap_time_seconds) by (driver_number)",
+          "expr": "avg_lap_time_seconds by (driver_number)",
           "format": "time_series",
           "instant": true,
           "legendFormat": "Driver {{driver_number}}",
