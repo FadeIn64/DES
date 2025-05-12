@@ -18,13 +18,10 @@ import (
 )
 
 func main() {
-	cfg := &config.Config{
-		KafkaBroker:  "localhost:9092",
-		KafkaTopic:   "laps",
-		KafkaGroupID: "lap-aggregator-group",
-		PGConnString: "postgres://username:password@localhost/das?sslmode=disable",
-		SectorsCount: 3,
-		ServerPort:   "2112",
+
+	cfg, err := config.Get()
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	application := app.NewApp(cfg)

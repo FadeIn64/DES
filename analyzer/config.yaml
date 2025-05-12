@@ -1,0 +1,5 @@
+kafka_broker: localhost:9092
+kafka_topic: laps
+kafka_group_id: laps_analysis
+db_url: postgres://username:password@localhost/das?sslmode=disable
+server_port: 2112
