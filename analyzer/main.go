@@ -19,7 +19,7 @@ import (
 
 func main() {
 	cfg := &config.Config{
-		KafkaBrokers: []string{"localhost:9092"},
+		KafkaBroker:  "localhost:9092",
 		KafkaTopic:   "laps",
 		KafkaGroupID: "lap-aggregator-group",
 		PGConnString: "postgres://username:password@localhost/das?sslmode=disable",
@@ -57,7 +57,7 @@ func setupKafkaConsumer(cfg *config.Config) sarama.ConsumerGroup {
 	}
 	config.Consumer.Offsets.Initial = sarama.OffsetOldest
 
-	consumer, err := sarama.NewConsumerGroup(cfg.KafkaBrokers, cfg.KafkaGroupID, config)
+	consumer, err := sarama.NewConsumerGroup([]string{cfg.KafkaBroker}, cfg.KafkaGroupID, config)
 	if err != nil {
 		log.Fatalf("Failed to create Kafka consumer: %v", err)
 	}
