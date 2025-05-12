@@ -177,7 +177,7 @@
         {
           "datasource": "Prometheus",
           "editorMode": "code",
-          "expr": "avg(f1_avg_lap_time_seconds) by (driver_number)",
+          "expr": "avg_lap_time_seconds by (driver_number)",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -202,6 +202,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "F1: Анализ темпа гонщиков",
-  "uid": "f1-drivers-pace",
+  "uid": "drivers-pace",
   "version": 1
 }

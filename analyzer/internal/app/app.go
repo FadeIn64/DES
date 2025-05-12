@@ -74,7 +74,6 @@ func initTransactionManager(pool *pgxpool.Pool) trm.Manager {
 
 	return manager.Must(
 		f,
-		//manager.WithSettings(*config.NewApp().TransactionSettings()),
 	)
 }
 

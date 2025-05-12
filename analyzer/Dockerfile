@@ -16,4 +16,4 @@ COPY --from=builder /build/das /build/das
 COPY --from=builder /build/config.yaml /build/config.yaml
 COPY --from=builder /build/migrations/. /build/migrations/.
 
-CMD [". /das"]
+CMD ["./das"]

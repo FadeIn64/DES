@@ -4,15 +4,20 @@ services:
     image: confluentinc/cp-zookeeper:7.4.4
     env_file:
       - zookeeper.env
+    networks:
+      - my_net
     ports:
       - "22181:2181"
   kafka:
     image: confluentinc/cp-kafka:7.4.4
+    hostname: kafka
     depends_on:
       - zookeeper
     ports:
       - "9093:9093"
       - "9092:9092"
+    networks:
+      - my_net
     env_file:
       - kafka.env
   service-db:
@@ -33,6 +38,7 @@ services:
       - db-data:/var/lib/postgresql/data
       - ./db/:/docker-entrypoint-initdb.d/
     restart: unless-stopped
+
   prometheus:
     image: prom/prometheus
     ports:
@@ -43,6 +49,21 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
     networks:
       - my_net
+    depends_on:
+      - das
+  das:
+    build: ./../analyzer/.
+    hostname: das
+    ports:
+      - "2112:2112"
+    env_file:
+      - das.env
+    networks:
+      - my_net
+    depends_on:
+      - kafka
+      - service-db
+
 
   grafana:
     image: grafana/grafana-enterprise

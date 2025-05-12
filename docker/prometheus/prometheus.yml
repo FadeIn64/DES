@@ -5,7 +5,7 @@ global:
 scrape_configs:
   - job_name: 'analyze-service'
     static_configs:
-      - targets: ['127.0.0.1:2112']
+      - targets: ['das:2112']
     metrics_path: '/metrics'
 
   - job_name: 'grafana'
