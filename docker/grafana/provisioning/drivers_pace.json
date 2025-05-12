@@ -77,7 +77,23 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "81"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 23,
@@ -295,12 +311,13 @@
           "useBackend": false
         }
       ],
-      "title": "Текущий средний тем гонщиков в гонке",
+      "title": "Текущий средний темп гонщиков в гонке",
       "transparent": true,
       "type": "bargauge"
     }
   ],
   "preload": false,
+  "refresh": "5s",
   "schemaVersion": 41,
   "tags": [],
   "templating": {
@@ -314,5 +331,5 @@
   "timezone": "browser",
   "title": "Анализ темпов гонщиков",
   "uid": "b919031c-566b-4df8-87af-b6c8c4a9c31f",
-  "version": 6
+  "version": 8
 }
