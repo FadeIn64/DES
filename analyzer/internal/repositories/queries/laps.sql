@@ -1,29 +1,35 @@
 -- name: GetLap :one
 SELECT * FROM laps
-WHERE driver_number = $1 AND lap_number = $2;
+WHERE driver_number = $1 AND lap_number = $2 AND meeting_key = $3 AND session_key = $4;
 
 -- name: GetAverageLapTime :one
 SELECT AVG(lap_duration)::float8
-FROM laps
+FROM complete_laps
 WHERE driver_number = $1
   AND is_pit_out_lap = $2
+  AND meeting_key = $3
+  AND session_key = $4
   AND lap_duration > 0;
 
 -- name: GetCurrentSegmentPace :one
 WITH segment AS (
     SELECT lap_number, lap_duration
-    FROM laps l
+    FROM complete_laps l
     WHERE l.driver_number = $1
       AND l.lap_number <= $2
+      AND l.meeting_key = $3
+      AND l.session_key = $4
       AND l.is_pit_out_lap = false
       AND l.lap_duration > 0
     ORDER BY l.lap_number DESC
     LIMIT (
         SELECT COALESCE(
-                       (SELECT MIN(l2.lap_number)
-                        FROM laps l2
+                       (SELECT COUNT(l2.lap_number)
+                        FROM complete_laps l2
                         WHERE l2.driver_number = $1
                           AND l2.lap_number <= $2
+                          AND l2.meeting_key = $3
+                          AND l2.session_key = $4
                           AND l2.is_pit_out_lap = true),
                        $2
                )
@@ -42,10 +48,8 @@ INSERT INTO laps (
 ) VALUES (
              $1, $2, $3, $4, $5, $6, $7, $8, $9
          )
-ON CONFLICT (driver_number, lap_number)
+ON CONFLICT ( meeting_key, session_key, driver_number, lap_number)
     DO UPDATE SET
-                  meeting_key = EXCLUDED.meeting_key,
-                  session_key = EXCLUDED.session_key,
                   date_start = EXCLUDED.date_start,
                   lap_duration = COALESCE(NULLIF(EXCLUDED.lap_duration, 0), laps.lap_duration),
                   sector_duration = EXCLUDED.sector_duration,
@@ -56,5 +60,5 @@ ON CONFLICT (driver_number, lap_number)
 -- name: MoveCompleteLap :exec
 INSERT INTO complete_laps
 SELECT * FROM laps l
-WHERE l.driver_number = $1 AND l.lap_number = $2 AND l.lap_duration > 0
-ON CONFLICT (driver_number, lap_number) DO NOTHING;
+WHERE l.meeting_key = $1 AND l.session_key = $2 AND l.driver_number = $3 AND l.lap_number = $4 AND l.lap_duration > 0
+ON CONFLICT (meeting_key, session_key, driver_number, lap_number) DO NOTHING;

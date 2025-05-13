@@ -13,19 +13,28 @@ import (
 
 const getAverageLapTime = `-- name: GetAverageLapTime :one
 SELECT AVG(lap_duration)::float8
-FROM laps
+FROM complete_laps
 WHERE driver_number = $1
   AND is_pit_out_lap = $2
+  AND meeting_key = $3
+  AND session_key = $4
   AND lap_duration > 0
 `
 
 type GetAverageLapTimeParams struct {
 	DriverNumber int32
 	IsPitOutLap  bool
+	MeetingKey   int32
+	SessionKey   int32
 }
 
 func (q *Queries) GetAverageLapTime(ctx context.Context, arg GetAverageLapTimeParams) (float64, error) {
-	row := q.db.QueryRow(ctx, getAverageLapTime, arg.DriverNumber, arg.IsPitOutLap)
+	row := q.db.QueryRow(ctx, getAverageLapTime,
+		arg.DriverNumber,
+		arg.IsPitOutLap,
+		arg.MeetingKey,
+		arg.SessionKey,
+	)
 	var column_1 float64
 	err := row.Scan(&column_1)
 	return column_1, err
@@ -34,18 +43,22 @@ func (q *Queries) GetAverageLapTime(ctx context.Context, arg GetAverageLapTimePa
 const getCurrentSegmentPace = `-- name: GetCurrentSegmentPace :one
 WITH segment AS (
     SELECT lap_number, lap_duration
-    FROM laps l
+    FROM complete_laps l
     WHERE l.driver_number = $1
       AND l.lap_number <= $2
+      AND l.meeting_key = $3
+      AND l.session_key = $4
       AND l.is_pit_out_lap = false
       AND l.lap_duration > 0
     ORDER BY l.lap_number DESC
     LIMIT (
         SELECT COALESCE(
-                       (SELECT MIN(l2.lap_number)
-                        FROM laps l2
+                       (SELECT COUNT(l2.lap_number)
+                        FROM complete_laps l2
                         WHERE l2.driver_number = $1
                           AND l2.lap_number <= $2
+                          AND l2.meeting_key = $3
+                          AND l2.session_key = $4
                           AND l2.is_pit_out_lap = true),
                        $2
                )
@@ -60,6 +73,8 @@ WITH segment AS (
 type GetCurrentSegmentPaceParams struct {
 	DriverNumber int32
 	LapNumber    int32
+	MeetingKey   int32
+	SessionKey   int32
 }
 
 type GetCurrentSegmentPaceRow struct {
@@ -68,7 +83,12 @@ type GetCurrentSegmentPaceRow struct {
 }
 
 func (q *Queries) GetCurrentSegmentPace(ctx context.Context, arg GetCurrentSegmentPaceParams) (GetCurrentSegmentPaceRow, error) {
-	row := q.db.QueryRow(ctx, getCurrentSegmentPace, arg.DriverNumber, arg.LapNumber)
+	row := q.db.QueryRow(ctx, getCurrentSegmentPace,
+		arg.DriverNumber,
+		arg.LapNumber,
+		arg.MeetingKey,
+		arg.SessionKey,
+	)
 	var i GetCurrentSegmentPaceRow
 	err := row.Scan(&i.AveragePace, &i.LapCount)
 	return i, err
@@ -76,16 +96,23 @@ func (q *Queries) GetCurrentSegmentPace(ctx context.Context, arg GetCurrentSegme
 
 const getLap = `-- name: GetLap :one
 SELECT meeting_key, session_key, driver_number, date_start, lap_duration, lap_number, sector_duration, info_time, is_pit_out_lap, updated_at FROM laps
-WHERE driver_number = $1 AND lap_number = $2
+WHERE driver_number = $1 AND lap_number = $2 AND meeting_key = $3 AND session_key = $4
 `
 
 type GetLapParams struct {
 	DriverNumber int32
 	LapNumber    int32
+	MeetingKey   int32
+	SessionKey   int32
 }
 
 func (q *Queries) GetLap(ctx context.Context, arg GetLapParams) (Lap, error) {
-	row := q.db.QueryRow(ctx, getLap, arg.DriverNumber, arg.LapNumber)
+	row := q.db.QueryRow(ctx, getLap,
+		arg.DriverNumber,
+		arg.LapNumber,
+		arg.MeetingKey,
+		arg.SessionKey,
+	)
 	var i Lap
 	err := row.Scan(
 		&i.MeetingKey,
@@ -105,17 +132,24 @@ func (q *Queries) GetLap(ctx context.Context, arg GetLapParams) (Lap, error) {
 const moveCompleteLap = `-- name: MoveCompleteLap :exec
 INSERT INTO complete_laps
 SELECT meeting_key, session_key, driver_number, date_start, lap_duration, lap_number, sector_duration, info_time, is_pit_out_lap, updated_at FROM laps l
-WHERE l.driver_number = $1 AND l.lap_number = $2 AND l.lap_duration > 0
-ON CONFLICT (driver_number, lap_number) DO NOTHING
+WHERE l.meeting_key = $1 AND l.session_key = $2 AND l.driver_number = $3 AND l.lap_number = $4 AND l.lap_duration > 0
+ON CONFLICT (meeting_key, session_key, driver_number, lap_number) DO NOTHING
 `
 
 type MoveCompleteLapParams struct {
+	MeetingKey   int32
+	SessionKey   int32
 	DriverNumber int32
 	LapNumber    int32
 }
 
 func (q *Queries) MoveCompleteLap(ctx context.Context, arg MoveCompleteLapParams) error {
-	_, err := q.db.Exec(ctx, moveCompleteLap, arg.DriverNumber, arg.LapNumber)
+	_, err := q.db.Exec(ctx, moveCompleteLap,
+		arg.MeetingKey,
+		arg.SessionKey,
+		arg.DriverNumber,
+		arg.LapNumber,
+	)
 	return err
 }
 
@@ -127,10 +161,8 @@ INSERT INTO laps (
 ) VALUES (
              $1, $2, $3, $4, $5, $6, $7, $8, $9
          )
-ON CONFLICT (driver_number, lap_number)
+ON CONFLICT ( meeting_key, session_key, driver_number, lap_number)
     DO UPDATE SET
-                  meeting_key = EXCLUDED.meeting_key,
-                  session_key = EXCLUDED.session_key,
                   date_start = EXCLUDED.date_start,
                   lap_duration = COALESCE(NULLIF(EXCLUDED.lap_duration, 0), laps.lap_duration),
                   sector_duration = EXCLUDED.sector_duration,

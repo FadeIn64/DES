@@ -35,6 +35,8 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 		_, err := q.GetLap(ctx, db.GetLapParams{
 			DriverNumber: lap.DriverNumber,
 			LapNumber:    lap.LapNumber,
+			MeetingKey:   lap.MeetingKey,
+			SessionKey:   lap.SessionKey,
 		})
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 			return fmt.Errorf("get lap: %w", err)
@@ -60,6 +62,8 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 			if err := q.MoveCompleteLap(ctx, db.MoveCompleteLapParams{
 				DriverNumber: lap.DriverNumber,
 				LapNumber:    lap.LapNumber,
+				MeetingKey:   lap.MeetingKey,
+				SessionKey:   lap.SessionKey,
 			}); err != nil {
 				return fmt.Errorf("move complete lap: %w", err)
 			}
@@ -72,11 +76,16 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 
 		analysis.DriverNumber = lap.DriverNumber
 		analysis.CurrentLapTime = lap.LapDuration
+		analysis.LapNumber = lap.LapNumber
+		analysis.MeetingKey = lap.MeetingKey
+		analysis.SessionKey = lap.SessionKey
 
 		// 3. Рассчитываем среднее время круга (исключая пит-стопы)
 		analysis.AverageLapTime, err = q.GetAverageLapTime(ctx, db.GetAverageLapTimeParams{
 			DriverNumber: lap.DriverNumber,
 			IsPitOutLap:  false,
+			MeetingKey:   lap.MeetingKey,
+			SessionKey:   lap.SessionKey,
 		})
 		if err != nil {
 			return fmt.Errorf("get average lap time: %w", err)
@@ -86,6 +95,8 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 		segment, err := q.GetCurrentSegmentPace(ctx, db.GetCurrentSegmentPaceParams{
 			DriverNumber: lap.DriverNumber,
 			LapNumber:    lap.LapNumber,
+			MeetingKey:   lap.MeetingKey,
+			SessionKey:   lap.SessionKey,
 		})
 		if err != nil {
 			return fmt.Errorf("get segment pace: %w", err)

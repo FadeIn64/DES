@@ -15,7 +15,10 @@ type Lap struct {
 }
 
 type LapAnalysis struct {
+	MeetingKey         int32
+	SessionKey         int32
 	DriverNumber       int32
+	LapNumber          int32
 	CurrentLapTime     float64
 	AverageLapTime     float64
 	AverageSegmentPace float64
