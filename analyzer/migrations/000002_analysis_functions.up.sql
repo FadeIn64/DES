@@ -8,7 +8,7 @@ BEGIN
 RETURN QUERY
     WITH segment AS (
         SELECT lap_number, lap_duration
-        FROM laps
+        FROM complete_laps
         WHERE driver_number = p_driver_number
           AND lap_number <= p_current_lap
           AND is_pit_out_lap = false
@@ -17,7 +17,7 @@ RETURN QUERY
         LIMIT (
             SELECT COALESCE(
                 (SELECT MIN(lap_number)
-                 FROM laps
+                 FROM complete_laps
                  WHERE driver_number = p_driver_number
                    AND lap_number <= p_current_lap
                    AND is_pit_out_lap = true),

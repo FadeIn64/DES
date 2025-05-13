@@ -10,7 +10,7 @@ CREATE TABLE laps (
                       info_time TIMESTAMPTZ NOT NULL,
                       is_pit_out_lap BOOLEAN NOT NULL DEFAULT FALSE,
                       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                      PRIMARY KEY (driver_number, lap_number)
+                      PRIMARY KEY (meeting_key, session_key, driver_number, lap_number)
 );
 
 CREATE TABLE complete_laps (
@@ -24,7 +24,7 @@ CREATE TABLE complete_laps (
                                info_time TIMESTAMPTZ NOT NULL,
                                is_pit_out_lap BOOLEAN NOT NULL DEFAULT FALSE,
                                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                               PRIMARY KEY (driver_number, lap_number)
+                               PRIMARY KEY (meeting_key, session_key, driver_number, lap_number)
 );
 
 -- +goose Down
