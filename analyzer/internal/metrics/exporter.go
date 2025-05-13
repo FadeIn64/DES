@@ -29,7 +29,7 @@ func NewMetricsExporter() *Exporter {
 				Name: "current_lap_time_seconds",
 				Help: "Current lap time by driver",
 			},
-			[]string{"driver_number", "meeting", "session", "lap_number"},
+			[]string{"driver_number", "meeting", "session"},
 		),
 		avgLapTime: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -98,10 +98,9 @@ func (e *Exporter) UpdateMetrics(analysis *models.LapAnalysis) {
 	driverLabel := fmt.Sprintf("%v", analysis.DriverNumber)
 	meeting := fmt.Sprintf("%v", analysis.MeetingKey)
 	session := fmt.Sprintf("%v", analysis.SessionKey)
-	lapNumber := fmt.Sprintf("%v", analysis.LapNumber)
 
 	if analysis.CurrentLapTime != 0 {
-		e.currentLapTime.WithLabelValues(driverLabel, meeting, session, lapNumber).Set(analysis.CurrentLapTime)
+		e.currentLapTime.WithLabelValues(driverLabel, meeting, session).Set(analysis.CurrentLapTime)
 		e.lapDeviation.WithLabelValues(driverLabel, meeting, session).Set(analysis.ComparisonWithAvg)
 
 		// Кодируем тренд в числовое значение
