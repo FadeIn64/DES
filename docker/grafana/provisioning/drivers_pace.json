@@ -18,12 +18,149 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 4,
+  "id": 1,
   "links": [],
+  "liveNow": true,
   "panels": [
     {
       "datasource": {
-        "uid": "belolo3kti9z4f"
+        "type": "prometheus",
+        "uid": "delr66npm5atcf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Номер Гонщика"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 144
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 23,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Номер Гонщика"
+          }
+        ]
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "last_over_time(current_lap_time_seconds{meeting=\"1241\", session=\"9566\"}[1m])",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "legendFormat": "{{driver_number}}",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Время последнего круга",
+      "transformations": [
+        {
+          "id": "timeSeriesTable",
+          "options": {
+            "A": {
+              "timeField": "Time"
+            }
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "driver_number",
+                "Trend #A"
+              ]
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "driver_number"
+              }
+            ],
+            "fields": {}
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "driver_number",
+            "renamePattern": "Номер Гонщика"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "Trend #A",
+            "renamePattern": "Время последнего круга"
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "delr66npm5atcf"
       },
       "fieldConfig": {
         "defaults": {
@@ -97,8 +234,8 @@
       },
       "gridPos": {
         "h": 23,
-        "w": 24,
-        "x": 0,
+        "w": 16,
+        "x": 8,
         "y": 0
       },
       "id": 3,
@@ -123,14 +260,18 @@
       "pluginVersion": "12.0.0",
       "targets": [
         {
-          "editorMode": "code",
+          "disableTextWrap": false,
+          "editorMode": "builder",
           "exemplar": false,
-          "expr": "last_over_time(current_lap_time_seconds[5s])",
+          "expr": "last_over_time(current_lap_time_seconds{meeting=\"1241\", session=\"9566\"}[5s])",
           "format": "time_series",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "{{driver_number}}",
           "range": true,
-          "refId": "A"
+          "refId": "A",
+          "useBackend": false
         }
       ],
       "title": "Круги гонщиков",
@@ -139,7 +280,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "belolo3kti9z4f"
+        "uid": "delr66npm5atcf"
       },
       "fieldConfig": {
         "defaults": {
@@ -216,7 +357,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "belolo3kti9z4f"
+        "uid": "delr66npm5atcf"
       },
       "fieldConfig": {
         "defaults": {
@@ -300,7 +441,7 @@
           "disableTextWrap": false,
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "last_over_time(avg_lap_time_seconds{driver_number!=\"0\"}[1m])",
+          "expr": "last_over_time(avg_lap_time_seconds{driver_number!=\"0\", meeting=\"1241\", session=\"9566\"}[1m])",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -324,12 +465,14 @@
     "list": []
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-15m",
     "to": "now"
   },
-  "timepicker": {},
+  "timepicker": {
+    "hidden": true
+  },
   "timezone": "browser",
-  "title": "Анализ темпов гонщиков",
+  "title": "Формула-1 Гран-При Венгрии 2024",
   "uid": "b919031c-566b-4df8-87af-b6c8c4a9c31f",
-  "version": 8
+  "version": 3
 }
