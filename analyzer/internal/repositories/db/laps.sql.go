@@ -13,7 +13,7 @@ import (
 
 const getAverageLapTime = `-- name: GetAverageLapTime :one
 SELECT AVG(lap_duration)::float8
-FROM complete_laps
+FROM laps
 WHERE driver_number = $1
   AND is_pit_out_lap = $2
   AND meeting_key = $3
@@ -43,7 +43,7 @@ func (q *Queries) GetAverageLapTime(ctx context.Context, arg GetAverageLapTimePa
 const getCurrentSegmentPace = `-- name: GetCurrentSegmentPace :one
 WITH segment AS (
     SELECT lap_number, lap_duration
-    FROM complete_laps l
+    FROM  complete_laps l
     WHERE l.driver_number = $1
       AND l.lap_number <= $2
       AND l.meeting_key = $3
@@ -52,14 +52,15 @@ WITH segment AS (
       AND l.lap_duration > 0
     ORDER BY l.lap_number DESC
     LIMIT (
-        SELECT COALESCE(
-                       (SELECT COUNT(l2.lap_number)
+        SELECT  COALESCE(
+                       (SELECT $2 - l2.lap_number
                         FROM complete_laps l2
                         WHERE l2.driver_number = $1
                           AND l2.lap_number <= $2
                           AND l2.meeting_key = $3
                           AND l2.session_key = $4
-                          AND l2.is_pit_out_lap = true),
+                          AND l2.is_pit_out_lap = true
+                        order by l2.lap_number desc),
                        $2
                )
         )
