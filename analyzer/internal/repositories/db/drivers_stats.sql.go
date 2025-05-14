@@ -12,7 +12,7 @@ import (
 )
 
 const getDriverStats = `-- name: GetDriverStats :one
-select position, meeting_key, session_key, driver_number, date_start, date_end, lap_duration, lap_number from drivers_stats_with_positions
+select position, meeting_key, session_key, driver_number, date_start, date_end, lap_duration, sectors, lap_number from drivers_stats_with_positions
 where meeting_key = $1 and session_key = $2 and driver_number = $3
 `
 
@@ -33,13 +33,14 @@ func (q *Queries) GetDriverStats(ctx context.Context, arg GetDriverStatsParams) 
 		&i.DateStart,
 		&i.DateEnd,
 		&i.LapDuration,
+		&i.Sectors,
 		&i.LapNumber,
 	)
 	return i, err
 }
 
 const getDriversStats = `-- name: GetDriversStats :many
-select position, meeting_key, session_key, driver_number, date_start, date_end, lap_duration, lap_number from drivers_stats_with_positions
+select position, meeting_key, session_key, driver_number, date_start, date_end, lap_duration, sectors, lap_number from drivers_stats_with_positions
 where meeting_key = $1 and session_key = $2
 order by position
 `
@@ -66,6 +67,7 @@ func (q *Queries) GetDriversStats(ctx context.Context, arg GetDriversStatsParams
 			&i.DateStart,
 			&i.DateEnd,
 			&i.LapDuration,
+			&i.Sectors,
 			&i.LapNumber,
 		); err != nil {
 			return nil, err
@@ -79,15 +81,16 @@ func (q *Queries) GetDriversStats(ctx context.Context, arg GetDriversStatsParams
 }
 
 const upsertDriverStats = `-- name: UpsertDriverStats :exec
-insert into drivers_stats (meeting_key, session_key, driver_number, date_start, date_end, lap_duration, lap_number)
-values ($1, $2, $3, $4, $5, $6, $7)
+insert into drivers_stats (meeting_key, session_key, driver_number, date_start, date_end, lap_duration, lap_number, sectors)
+values ($1, $2, $3, $4, $5, $6, $7, $8)
 on conflict (meeting_key, session_key, driver_number)
 do update set
               driver_number = excluded.driver_number,
               date_start = excluded.date_start,
               date_end = excluded.date_end,
               lap_duration = excluded.lap_duration,
-              lap_number = excluded.lap_number
+              lap_number = excluded.lap_number,
+              sectors = excluded.sectors
 `
 
 type UpsertDriverStatsParams struct {
@@ -98,6 +101,7 @@ type UpsertDriverStatsParams struct {
 	DateEnd      pgtype.Timestamptz
 	LapDuration  float64
 	LapNumber    int32
+	Sectors      int32
 }
 
 func (q *Queries) UpsertDriverStats(ctx context.Context, arg UpsertDriverStatsParams) error {
@@ -109,6 +113,7 @@ func (q *Queries) UpsertDriverStats(ctx context.Context, arg UpsertDriverStatsPa
 		arg.DateEnd,
 		arg.LapDuration,
 		arg.LapNumber,
+		arg.Sectors,
 	)
 	return err
 }

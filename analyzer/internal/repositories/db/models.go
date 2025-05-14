@@ -28,6 +28,7 @@ type DriversStat struct {
 	DateStart    pgtype.Timestamptz
 	DateEnd      pgtype.Timestamptz
 	LapDuration  float64
+	Sectors      int32
 	LapNumber    int32
 }
 
@@ -39,6 +40,7 @@ type DriversStatsWithPosition struct {
 	DateStart    pgtype.Timestamptz
 	DateEnd      pgtype.Timestamptz
 	LapDuration  float64
+	Sectors      int32
 	LapNumber    int32
 }
 
