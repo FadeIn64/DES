@@ -133,11 +133,16 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 func (r *LapRepository) AddDriverStats(ctx context.Context, q *db.Queries, lap models.Lap) error {
 
 	lapDuration := float64(0)
+	sectors := 0
 	if lap.LapDuration != 0 {
 		lapDuration = lap.LapDuration
+		sectors = len(lap.SectorDuration)
 	} else {
 		for _, sector := range lap.SectorDuration {
 			lapDuration += sector
+			if sector > 0 {
+				sectors++
+			}
 		}
 	}
 
@@ -151,6 +156,7 @@ func (r *LapRepository) AddDriverStats(ctx context.Context, q *db.Queries, lap m
 		DriverNumber: lap.DriverNumber,
 		LapNumber:    lap.LapNumber,
 		LapDuration:  lapDuration,
+		Sectors:      int32(sectors),
 		DateStart:    pgtype.Timestamptz{Time: lap.DateStart, Valid: true},
 		DateEnd:      pgtype.Timestamptz{Time: dateEnd, Valid: true},
 	}
