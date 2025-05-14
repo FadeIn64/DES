@@ -11,8 +11,11 @@ import (
 type Querier interface {
 	GetAverageLapTime(ctx context.Context, arg GetAverageLapTimeParams) (float64, error)
 	GetCurrentSegmentPace(ctx context.Context, arg GetCurrentSegmentPaceParams) (GetCurrentSegmentPaceRow, error)
+	GetDriverStats(ctx context.Context, arg GetDriverStatsParams) (DriversStatsWithPosition, error)
+	GetDriversStats(ctx context.Context, arg GetDriversStatsParams) ([]DriversStatsWithPosition, error)
 	GetLap(ctx context.Context, arg GetLapParams) (Lap, error)
 	MoveCompleteLap(ctx context.Context, arg MoveCompleteLapParams) error
+	UpsertDriverStats(ctx context.Context, arg UpsertDriverStatsParams) error
 	UpsertLap(ctx context.Context, arg UpsertLapParams) error
 }
 

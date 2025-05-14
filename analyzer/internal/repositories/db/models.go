@@ -21,6 +21,27 @@ type CompleteLap struct {
 	UpdatedAt      pgtype.Timestamptz
 }
 
+type DriversStat struct {
+	MeetingKey   int32
+	SessionKey   int32
+	DriverNumber int32
+	DateStart    pgtype.Timestamptz
+	DateEnd      pgtype.Timestamptz
+	LapDuration  float64
+	LapNumber    int32
+}
+
+type DriversStatsWithPosition struct {
+	Position     int64
+	MeetingKey   int32
+	SessionKey   int32
+	DriverNumber int32
+	DateStart    pgtype.Timestamptz
+	DateEnd      pgtype.Timestamptz
+	LapDuration  float64
+	LapNumber    int32
+}
+
 type Lap struct {
 	MeetingKey     int32
 	SessionKey     int32
