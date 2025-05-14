@@ -11,6 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"time"
 )
 
 type LapRepository struct {
@@ -69,6 +70,11 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 			}
 		}
 
+		err = r.AddDriverStats(ctx, q, lap)
+		if err != nil {
+			return fmt.Errorf("add driver stats: %w", err)
+		}
+
 		// 2. Если это пит-стоп, завершаем обработку
 		if lap.IsPitOutLap {
 			return nil
@@ -122,6 +128,34 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 		return nil, err
 	}
 	return &analysis, nil
+}
+
+func (r *LapRepository) AddDriverStats(ctx context.Context, q *db.Queries, lap models.Lap) error {
+
+	lapDuration := float64(0)
+	if lap.LapDuration != 0 {
+		lapDuration = lap.LapDuration
+	} else {
+		for _, sector := range lap.SectorDuration {
+			lapDuration += sector
+		}
+	}
+
+	timeEnd := int64(lapDuration * 1000)
+
+	dateEnd := lap.DateStart.Add(time.Millisecond * time.Duration(timeEnd))
+
+	args := db.UpsertDriverStatsParams{
+		MeetingKey:   lap.MeetingKey,
+		SessionKey:   lap.SessionKey,
+		DriverNumber: lap.DriverNumber,
+		LapNumber:    lap.LapNumber,
+		LapDuration:  lapDuration,
+		DateStart:    pgtype.Timestamptz{Time: lap.DateStart, Valid: true},
+		DateEnd:      pgtype.Timestamptz{Time: dateEnd, Valid: true},
+	}
+
+	return q.UpsertDriverStats(ctx, args)
 }
 
 func (r *LapRepository) calculateTrend(current, average float64) string {
