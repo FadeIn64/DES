@@ -88,8 +88,8 @@
         "showHeader": true,
         "sortBy": [
           {
-            "desc": true,
-            "displayName": "Номер Гонщика"
+            "desc": false,
+            "displayName": "Время последнего круга"
           }
         ]
       },
@@ -340,7 +340,7 @@
         {
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "last_over_time(segment_pace_seconds{driver_number!=\"0\"}[1m])",
+          "expr": "last_over_time(segment_pace_seconds{driver_number!=\"0\", session=\"9566\", meeting=\"1241\"}[1m])",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -350,7 +350,7 @@
           "useBackend": false
         }
       ],
-      "title": "Средний темп гонщиков на отрезке",
+      "title": "Текущий средний темп гонщиков на отрезке",
       "transparent": true,
       "type": "bargauge"
     },
@@ -465,14 +465,12 @@
     "list": []
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-30m",
     "to": "now"
   },
-  "timepicker": {
-    "hidden": true
-  },
+  "timepicker": {},
   "timezone": "browser",
   "title": "Формула-1 Гран-При Венгрии 2024",
   "uid": "b919031c-566b-4df8-87af-b6c8c4a9c31f",
-  "version": 3
+  "version": 6
 }
