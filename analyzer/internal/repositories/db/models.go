@@ -21,6 +21,14 @@ type CompleteLap struct {
 	UpdatedAt      pgtype.Timestamptz
 }
 
+type DriversInterval struct {
+	MeetingKey               int32
+	SessionKey               int32
+	DriverNumber             int32
+	Interval                 float64
+	PredictionLapsToOvertake pgtype.Int4
+}
+
 type DriversStat struct {
 	MeetingKey       int32
 	SessionKey       int32

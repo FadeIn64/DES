@@ -17,6 +17,7 @@ type Querier interface {
 	GetDriversStats(ctx context.Context, arg GetDriversStatsParams) ([]DriversStatsWithPosition, error)
 	GetLap(ctx context.Context, arg GetLapParams) (Lap, error)
 	MoveCompleteLap(ctx context.Context, arg MoveCompleteLapParams) error
+	UpsertDriversInterval(ctx context.Context, arg UpsertDriversIntervalParams) error
 	UpsertLap(ctx context.Context, arg UpsertLapParams) error
 }
 

@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getDriverByPosition = `-- name: GetDriverByPosition :one
@@ -116,4 +118,32 @@ func (q *Queries) GetDriversStats(ctx context.Context, arg GetDriversStatsParams
 		return nil, err
 	}
 	return items, nil
+}
+
+const upsertDriversInterval = `-- name: UpsertDriversInterval :exec
+insert into drivers_intervals (meeting_key, session_key, driver_number, interval, prediction_laps_to_overtake)
+values ($1, $2, $3, $4, $5)
+on conflict (meeting_key, session_key, driver_number) do update
+set
+    interval = excluded.interval,
+    prediction_laps_to_overtake = excluded.prediction_laps_to_overtake
+`
+
+type UpsertDriversIntervalParams struct {
+	MeetingKey               int32
+	SessionKey               int32
+	DriverNumber             int32
+	Interval                 float64
+	PredictionLapsToOvertake pgtype.Int4
+}
+
+func (q *Queries) UpsertDriversInterval(ctx context.Context, arg UpsertDriversIntervalParams) error {
+	_, err := q.db.Exec(ctx, upsertDriversInterval,
+		arg.MeetingKey,
+		arg.SessionKey,
+		arg.DriverNumber,
+		arg.Interval,
+		arg.PredictionLapsToOvertake,
+	)
+	return err
 }
