@@ -13,7 +13,7 @@ import (
 
 const getAverageLapTime = `-- name: GetAverageLapTime :one
 SELECT AVG(lap_duration)::float8
-FROM laps
+FROM complete_laps
 WHERE driver_number = $1
   AND is_pit_out_lap = $2
   AND meeting_key = $3
