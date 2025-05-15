@@ -140,6 +140,16 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 
 		// Если гонщик едет первым, то считать отставние не откого
 		if curDriver.Position == 1 {
+			err = q.UpsertDriversInterval(ctx, db.UpsertDriversIntervalParams{
+				MeetingKey:               lap.MeetingKey,
+				SessionKey:               lap.SessionKey,
+				DriverNumber:             lap.DriverNumber,
+				Interval:                 0,
+				PredictionLapsToOvertake: pgtype.Int4{Int32: MaxLapsToOvertake, Valid: true},
+			})
+			if err != nil {
+				return fmt.Errorf("upsert driver interval: %w", err)
+			}
 			return nil
 		}
 
@@ -181,7 +191,7 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 		if analysis.AverageSegmentPace != 0 && nextDriverSegmentPace.AveragePace != 0 {
 			paceDiff := analysis.AverageSegmentPace - nextDriverSegmentPace.AveragePace
 			if paceDiff > 0 {
-				predictOvertakeFloat := math.Ceil(interval / paceDiff)
+				predictOvertakeFloat := -1 * math.Ceil(interval/paceDiff)
 				if predictOvertakeFloat < 11 {
 					predictOvertake = int(predictOvertakeFloat)
 				}
