@@ -21,10 +21,31 @@ type CompleteLap struct {
 	UpdatedAt      pgtype.Timestamptz
 }
 
+type DriverPositionsWithIntervalsAndLastLap struct {
+	Position                 int64
+	MeetingKey               int32
+	SessionKey               int32
+	DriverNumber             int32
+	LapNumber                int32
+	Interval                 float64
+	PredictionLapsToOvertake pgtype.Int4
+	LastLapDuration          float64
+}
+
 type DriversInterval struct {
 	MeetingKey               int32
 	SessionKey               int32
 	DriverNumber             int32
+	Interval                 float64
+	PredictionLapsToOvertake pgtype.Int4
+}
+
+type DriversPositionsWithInterval struct {
+	Position                 int64
+	MeetingKey               int32
+	SessionKey               int32
+	DriverNumber             int32
+	LapNumber                int32
 	Interval                 float64
 	PredictionLapsToOvertake pgtype.Int4
 }

@@ -40,7 +40,8 @@ WITH segment AS (
                           AND l2.meeting_key = $3
                           AND l2.session_key = $4
                           AND l2.is_pit_out_lap = true
-                        order by l2.lap_number desc),
+                        order by l2.lap_number desc
+                        limit 1),
                        $2
                )
         )
