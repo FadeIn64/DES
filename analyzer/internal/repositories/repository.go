@@ -31,7 +31,7 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 		var err error
 		q := db.New(trmpgx.DefaultCtxGetter.DefaultTrOrDB(ctx, r.db))
 
-		// 1. Считаем дополнительные параметры
+		// Считаем дополнительные параметры
 		lapDuration := float64(0)
 		completedSectors := 0
 		if lap.LapDuration != 0 {
@@ -48,7 +48,7 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 		timeEnd := int64(lapDuration * 1000)
 		dateEnd := lap.DateStart.Add(time.Millisecond * time.Duration(timeEnd))
 
-		// 2. Вставляем/обновляем запись
+		//. Вставляем/обновляем запись
 		if err := q.UpsertLap(ctx, db.UpsertLapParams{
 			MeetingKey:       lap.MeetingKey,
 			SessionKey:       lap.SessionKey,
@@ -65,7 +65,7 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 			return fmt.Errorf("upsert lap: %w", err)
 		}
 
-		// 3. Если круг завершен, перемещаем его
+		// Если круг завершен, перемещаем его
 		if lap.LapDuration > 0 {
 			if err := q.MoveCompleteLap(ctx, db.MoveCompleteLapParams{
 				DriverNumber:     lap.DriverNumber,
@@ -78,7 +78,7 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 			}
 		}
 
-		// 2. Если это пит-стоп, завершаем обработку
+		//. Если это пит-стоп, завершаем обработку
 		if lap.IsPitOutLap {
 			return nil
 		}
@@ -89,7 +89,7 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 		analysis.MeetingKey = lap.MeetingKey
 		analysis.SessionKey = lap.SessionKey
 
-		// 3. Рассчитываем среднее время круга (исключая пит-стопы)
+		// Рассчитываем среднее время круга (исключая пит-стопы)
 		analysis.AverageLapTime, err = q.GetAverageLapTime(ctx, db.GetAverageLapTimeParams{
 			DriverNumber: lap.DriverNumber,
 			IsPitOutLap:  false,
@@ -100,7 +100,7 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 			return fmt.Errorf("get average lap time: %w", err)
 		}
 
-		// 4. Рассчитываем средний темп на текущем сегменте
+		// Рассчитываем средний темп на текущем сегменте
 		segment, err := q.GetCurrentSegmentPace(ctx, db.GetCurrentSegmentPaceParams{
 			DriverNumber: lap.DriverNumber,
 			LapNumber:    lap.LapNumber,
@@ -114,12 +114,12 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 		analysis.AverageSegmentPace = segment.AveragePace
 		analysis.LapsInSegment = int(segment.LapCount)
 
-		// 5. Сравнение текущего круга со средним
+		// Сравнение текущего круга со средним
 		if analysis.AverageLapTime > 0 {
 			analysis.ComparisonWithAvg = (analysis.CurrentLapTime - analysis.AverageLapTime) / analysis.AverageLapTime * 100
 		}
 
-		// 6. Определяем тренд
+		// Определяем тренд
 		analysis.PositionTrend = r.calculateTrend(
 			analysis.CurrentLapTime,
 			analysis.AverageSegmentPace,
