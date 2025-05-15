@@ -11,8 +11,37 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const execCompletedLapByDriver = `-- name: ExecCompletedLapByDriver :one
+SELECT count(*)
+FROM complete_laps
+WHERE driver_number = $1
+  AND is_pit_out_lap = $2
+  AND meeting_key = $3
+  AND session_key = $4
+  AND lap_duration > 0
+`
+
+type ExecCompletedLapByDriverParams struct {
+	DriverNumber int32
+	IsPitOutLap  bool
+	MeetingKey   int32
+	SessionKey   int32
+}
+
+func (q *Queries) ExecCompletedLapByDriver(ctx context.Context, arg ExecCompletedLapByDriverParams) (int64, error) {
+	row := q.db.QueryRow(ctx, execCompletedLapByDriver,
+		arg.DriverNumber,
+		arg.IsPitOutLap,
+		arg.MeetingKey,
+		arg.SessionKey,
+	)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getAverageLapTime = `-- name: GetAverageLapTime :one
-SELECT AVG(lap_duration)::float8
+SELECT COALESCE(AVG(lap_duration), 0)::float8
 FROM complete_laps
 WHERE driver_number = $1
   AND is_pit_out_lap = $2
@@ -66,7 +95,7 @@ WITH segment AS (
         )
     )
     SELECT
-        AVG(lap_duration)::float8 as average_pace,
+        COALESCE(AVG(lap_duration), 0)::float8 as average_pace,
         COUNT(*) as lap_count
     FROM segment
 `

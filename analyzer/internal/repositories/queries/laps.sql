@@ -2,8 +2,17 @@
 SELECT * FROM laps
 WHERE driver_number = $1 AND lap_number = $2 AND meeting_key = $3 AND session_key = $4;
 
+-- name: ExecCompletedLapByDriver :one
+SELECT count(*)
+FROM complete_laps
+WHERE driver_number = $1
+  AND is_pit_out_lap = $2
+  AND meeting_key = $3
+  AND session_key = $4
+  AND lap_duration > 0;
+
 -- name: GetAverageLapTime :one
-SELECT AVG(lap_duration)::float8
+SELECT COALESCE(AVG(lap_duration), 0)::float8
 FROM complete_laps
 WHERE driver_number = $1
   AND is_pit_out_lap = $2
@@ -37,7 +46,7 @@ WITH segment AS (
         )
     )
     SELECT
-        AVG(lap_duration)::float8 as average_pace,
+        COALESCE(AVG(lap_duration), 0)::float8 as average_pace,
         COUNT(*) as lap_count
     FROM segment;
 

@@ -9,6 +9,7 @@ import (
 )
 
 type Querier interface {
+	ExecCompletedLapByDriver(ctx context.Context, arg ExecCompletedLapByDriverParams) (int64, error)
 	GetAverageLapTime(ctx context.Context, arg GetAverageLapTimeParams) (float64, error)
 	GetCurrentSegmentPace(ctx context.Context, arg GetCurrentSegmentPaceParams) (GetCurrentSegmentPaceRow, error)
 	GetDriverStats(ctx context.Context, arg GetDriverStatsParams) (DriversStatsWithPosition, error)
