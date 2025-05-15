@@ -226,6 +226,7 @@
               "mode": "off"
             }
           },
+          "decimals": 3,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -499,5 +500,5 @@
   "timezone": "browser",
   "title": "Формула-1 Гран-При Венгрии 2024",
   "uid": "b919031c-566b-4df8-87af-b6c8c4a9c31f",
-  "version": 6
+  "version": 7
 }
