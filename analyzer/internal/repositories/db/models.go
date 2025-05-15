@@ -45,14 +45,16 @@ type DriversStatsWithPosition struct {
 }
 
 type Lap struct {
-	MeetingKey     int32
-	SessionKey     int32
-	DriverNumber   int32
-	DateStart      pgtype.Timestamptz
-	LapDuration    float64
-	LapNumber      int32
-	SectorDuration []float64
-	InfoTime       pgtype.Timestamptz
-	IsPitOutLap    bool
-	UpdatedAt      pgtype.Timestamptz
+	MeetingKey       int32
+	SessionKey       int32
+	DriverNumber     int32
+	CompletedSectors int32
+	DateStart        pgtype.Timestamptz
+	LapDuration      float64
+	LapNumber        int32
+	SectorDuration   []float64
+	DateEnd          pgtype.Timestamptz
+	InfoTime         pgtype.Timestamptz
+	IsPitOutLap      bool
+	UpdatedAt        pgtype.Timestamptz
 }
