@@ -28,6 +28,7 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 	var analysis models.LapAnalysis
 
 	err := r.manager.Do(ctx, func(ctx context.Context) error {
+		var err error
 		q := db.New(trmpgx.DefaultCtxGetter.DefaultTrOrDB(ctx, r.db))
 
 		// 1. Считаем дополнительные параметры
@@ -75,11 +76,6 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 			}); err != nil {
 				return fmt.Errorf("move complete lap: %w", err)
 			}
-		}
-
-		err := r.AddDriverStats(ctx, q, lap)
-		if err != nil {
-			return fmt.Errorf("add driver stats: %w", err)
 		}
 
 		// 2. Если это пит-стоп, завершаем обработку
@@ -135,40 +131,6 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 		return nil, err
 	}
 	return &analysis, nil
-}
-
-func (r *LapRepository) AddDriverStats(ctx context.Context, q *db.Queries, lap models.Lap) error {
-
-	lapDuration := float64(0)
-	sectors := 0
-	if lap.LapDuration != 0 {
-		lapDuration = lap.LapDuration
-		sectors = len(lap.SectorDuration)
-	} else {
-		for _, sector := range lap.SectorDuration {
-			lapDuration += sector
-			if sector > 0 {
-				sectors++
-			}
-		}
-	}
-
-	timeEnd := int64(lapDuration * 1000)
-
-	dateEnd := lap.DateStart.Add(time.Millisecond * time.Duration(timeEnd))
-
-	args := db.UpsertDriverStatsParams{
-		MeetingKey:   lap.MeetingKey,
-		SessionKey:   lap.SessionKey,
-		DriverNumber: lap.DriverNumber,
-		LapNumber:    lap.LapNumber,
-		LapDuration:  lapDuration,
-		Sectors:      int32(sectors),
-		DateStart:    pgtype.Timestamptz{Time: lap.DateStart, Valid: true},
-		DateEnd:      pgtype.Timestamptz{Time: dateEnd, Valid: true},
-	}
-
-	return q.UpsertDriverStats(ctx, args)
 }
 
 func (r *LapRepository) calculateTrend(current, average float64) string {
