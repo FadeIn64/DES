@@ -7,12 +7,42 @@ package db
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getDriverByPosition = `-- name: GetDriverByPosition :one
+select position, meeting_key, session_key, driver_number, completed_sectors, date_start, lap_duration, lap_number, sector_duration, date_end, info_time, is_pit_out_lap, updated_at from drivers_stats_with_positions
+where meeting_key = $1 and session_key = $2 and position = $3
+`
+
+type GetDriverByPositionParams struct {
+	MeetingKey int32
+	SessionKey int32
+	Position   int64
+}
+
+func (q *Queries) GetDriverByPosition(ctx context.Context, arg GetDriverByPositionParams) (DriversStatsWithPosition, error) {
+	row := q.db.QueryRow(ctx, getDriverByPosition, arg.MeetingKey, arg.SessionKey, arg.Position)
+	var i DriversStatsWithPosition
+	err := row.Scan(
+		&i.Position,
+		&i.MeetingKey,
+		&i.SessionKey,
+		&i.DriverNumber,
+		&i.CompletedSectors,
+		&i.DateStart,
+		&i.LapDuration,
+		&i.LapNumber,
+		&i.SectorDuration,
+		&i.DateEnd,
+		&i.InfoTime,
+		&i.IsPitOutLap,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getDriverStats = `-- name: GetDriverStats :one
-select position, meeting_key, session_key, driver_number, date_start, date_end, lap_duration, sectors, lap_number from drivers_stats_with_positions
+select position, meeting_key, session_key, driver_number, completed_sectors, date_start, lap_duration, lap_number, sector_duration, date_end, info_time, is_pit_out_lap, updated_at from drivers_stats_with_positions
 where meeting_key = $1 and session_key = $2 and driver_number = $3
 `
 
@@ -30,17 +60,21 @@ func (q *Queries) GetDriverStats(ctx context.Context, arg GetDriverStatsParams) 
 		&i.MeetingKey,
 		&i.SessionKey,
 		&i.DriverNumber,
+		&i.CompletedSectors,
 		&i.DateStart,
-		&i.DateEnd,
 		&i.LapDuration,
-		&i.Sectors,
 		&i.LapNumber,
+		&i.SectorDuration,
+		&i.DateEnd,
+		&i.InfoTime,
+		&i.IsPitOutLap,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getDriversStats = `-- name: GetDriversStats :many
-select position, meeting_key, session_key, driver_number, date_start, date_end, lap_duration, sectors, lap_number from drivers_stats_with_positions
+select position, meeting_key, session_key, driver_number, completed_sectors, date_start, lap_duration, lap_number, sector_duration, date_end, info_time, is_pit_out_lap, updated_at from drivers_stats_with_positions
 where meeting_key = $1 and session_key = $2
 order by position
 `
@@ -64,11 +98,15 @@ func (q *Queries) GetDriversStats(ctx context.Context, arg GetDriversStatsParams
 			&i.MeetingKey,
 			&i.SessionKey,
 			&i.DriverNumber,
+			&i.CompletedSectors,
 			&i.DateStart,
-			&i.DateEnd,
 			&i.LapDuration,
-			&i.Sectors,
 			&i.LapNumber,
+			&i.SectorDuration,
+			&i.DateEnd,
+			&i.InfoTime,
+			&i.IsPitOutLap,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -78,42 +116,4 @@ func (q *Queries) GetDriversStats(ctx context.Context, arg GetDriversStatsParams
 		return nil, err
 	}
 	return items, nil
-}
-
-const upsertDriverStats = `-- name: UpsertDriverStats :exec
-insert into drivers_stats (meeting_key, session_key, driver_number, date_start, date_end, lap_duration, lap_number, sectors)
-values ($1, $2, $3, $4, $5, $6, $7, $8)
-on conflict (meeting_key, session_key, driver_number)
-do update set
-              driver_number = excluded.driver_number,
-              date_start = excluded.date_start,
-              date_end = excluded.date_end,
-              lap_duration = excluded.lap_duration,
-              lap_number = excluded.lap_number,
-              sectors = excluded.sectors
-`
-
-type UpsertDriverStatsParams struct {
-	MeetingKey   int32
-	SessionKey   int32
-	DriverNumber int32
-	DateStart    pgtype.Timestamptz
-	DateEnd      pgtype.Timestamptz
-	LapDuration  float64
-	LapNumber    int32
-	Sectors      int32
-}
-
-func (q *Queries) UpsertDriverStats(ctx context.Context, arg UpsertDriverStatsParams) error {
-	_, err := q.db.Exec(ctx, upsertDriverStats,
-		arg.MeetingKey,
-		arg.SessionKey,
-		arg.DriverNumber,
-		arg.DateStart,
-		arg.DateEnd,
-		arg.LapDuration,
-		arg.LapNumber,
-		arg.Sectors,
-	)
-	return err
 }

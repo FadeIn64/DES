@@ -1,6 +1,6 @@
 -- name: GetLap :one
 SELECT * FROM laps
-WHERE driver_number = $1 AND lap_number = $2 AND meeting_key = $3 AND session_key = $4;
+WHERE driver_number = $1 AND lap_number = $2 AND meeting_key = $3 AND session_key = $4 AND completed_sectors = $5;
 
 -- name: ExecCompletedLapByDriver :one
 SELECT count(*)

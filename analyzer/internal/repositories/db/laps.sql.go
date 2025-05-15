@@ -126,14 +126,15 @@ func (q *Queries) GetCurrentSegmentPace(ctx context.Context, arg GetCurrentSegme
 
 const getLap = `-- name: GetLap :one
 SELECT meeting_key, session_key, driver_number, completed_sectors, date_start, lap_duration, lap_number, sector_duration, date_end, info_time, is_pit_out_lap, updated_at FROM laps
-WHERE driver_number = $1 AND lap_number = $2 AND meeting_key = $3 AND session_key = $4
+WHERE driver_number = $1 AND lap_number = $2 AND meeting_key = $3 AND session_key = $4 AND completed_sectors = $5
 `
 
 type GetLapParams struct {
-	DriverNumber int32
-	LapNumber    int32
-	MeetingKey   int32
-	SessionKey   int32
+	DriverNumber     int32
+	LapNumber        int32
+	MeetingKey       int32
+	SessionKey       int32
+	CompletedSectors int32
 }
 
 func (q *Queries) GetLap(ctx context.Context, arg GetLapParams) (Lap, error) {
@@ -142,6 +143,7 @@ func (q *Queries) GetLap(ctx context.Context, arg GetLapParams) (Lap, error) {
 		arg.LapNumber,
 		arg.MeetingKey,
 		arg.SessionKey,
+		arg.CompletedSectors,
 	)
 	var i Lap
 	err := row.Scan(
