@@ -16,7 +16,6 @@ type Exporter struct {
 	avgLapTime     *prometheus.GaugeVec
 	segmentPace    *prometheus.GaugeVec
 	lapsInSegment  *prometheus.GaugeVec
-	trendDirection *prometheus.GaugeVec
 
 	// Дополнительные метрики
 	lapDeviation *prometheus.GaugeVec
@@ -52,13 +51,6 @@ func NewMetricsExporter() *Exporter {
 			},
 			[]string{"driver_number", "meeting", "session"},
 		),
-		trendDirection: prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "lap_trend_direction",
-				Help: "Lap trend direction (1=improving, 0=stable, -1=declining)",
-			},
-			[]string{"driver_number", "meeting", "session"},
-		),
 		lapDeviation: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Name: "lap_deviation_percent",
@@ -75,7 +67,6 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.avgLapTime.Describe(ch)
 	e.segmentPace.Describe(ch)
 	e.lapsInSegment.Describe(ch)
-	e.trendDirection.Describe(ch)
 	e.lapDeviation.Describe(ch)
 }
 
@@ -87,7 +78,6 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	e.avgLapTime.Collect(ch)
 	e.segmentPace.Collect(ch)
 	e.lapsInSegment.Collect(ch)
-	e.trendDirection.Collect(ch)
 	e.lapDeviation.Collect(ch)
 }
 
@@ -101,19 +91,6 @@ func (e *Exporter) UpdateMetrics(analysis *models.LapAnalysis) {
 
 	if analysis.CurrentLapTime != 0 {
 		e.currentLapTime.WithLabelValues(driverLabel, meeting, session).Set(analysis.CurrentLapTime)
-		e.lapDeviation.WithLabelValues(driverLabel, meeting, session).Set(analysis.ComparisonWithAvg)
-
-		// Кодируем тренд в числовое значение
-		var trendValue float64
-		switch analysis.PositionTrend {
-		case "improving":
-			trendValue = 1
-		case "declining":
-			trendValue = -1
-		default:
-			trendValue = 0
-		}
-		e.trendDirection.WithLabelValues(driverLabel, meeting, session).Set(trendValue)
 	}
 	e.avgLapTime.WithLabelValues(driverLabel, meeting, session).Set(analysis.AverageLapTime)
 	e.segmentPace.WithLabelValues(driverLabel, "current", meeting, session).Set(analysis.AverageSegmentPace)
