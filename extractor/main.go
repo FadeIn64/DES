@@ -85,44 +85,6 @@ func main() {
 	}
 }
 
-//func receiveLaps(ctx context.Context, LapExtractor extractors.LapExtractor) {
-//	canceled := false
-//	go func(extractor extractors.LapExtractor) {
-//
-//		start, err := getStartDate()
-//
-//		if err != nil {
-//			log.Fatal(err)
-//		}
-//
-//		lastNow := time.Now()
-//		fromRaceTime := start
-//
-//		for !canceled {
-//			curNow := time.Now()
-//			diff := curNow.Sub(lastNow)
-//
-//			toRaceTime := fromRaceTime.Add(diff)
-//
-//			laps, err := extractor.ExtractLaps(ctx, fromRaceTime, toRaceTime)
-//			if err != nil {
-//				log.Fatal(err)
-//			}
-//			log.Printf("Laps: %v", laps)
-//
-//			lastNow = curNow
-//			fromRaceTime = toRaceTime
-//			<-time.After(2 * time.Second)
-//
-//		}
-//	}(LapExtractor)
-//
-//	select {
-//	case <-ctx.Done():
-//		canceled = true
-//	}
-//}
-
 func getStartDate() (time.Time, error) {
 
 	// Парсим строку в time.Time
