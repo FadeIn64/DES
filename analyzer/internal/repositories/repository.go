@@ -51,7 +51,7 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 		timeEnd := int64(lapDuration * 1000)
 		dateEnd := lap.DateStart.Add(time.Millisecond * time.Duration(timeEnd))
 
-		//. Вставляем/обновляем запись
+		// Вставляем/обновляем запись
 		if err := q.UpsertLap(ctx, db.UpsertLapParams{
 			MeetingKey:       lap.MeetingKey,
 			SessionKey:       lap.SessionKey,
@@ -81,52 +81,39 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 			}
 		}
 
-		//. Если это пит-стоп, завершаем обработку
-		if lap.IsPitOutLap {
-			return nil
+		// Если это не пит-стоп, то обрабатываем средний темп
+		if !lap.IsPitOutLap {
+			analysis.DriverNumber = lap.DriverNumber
+			analysis.CurrentLapTime = lap.LapDuration
+			analysis.LapNumber = lap.LapNumber
+			analysis.MeetingKey = lap.MeetingKey
+			analysis.SessionKey = lap.SessionKey
+
+			// Рассчитываем среднее время круга (исключая пит-стопы)
+			analysis.AverageLapTime, err = q.GetAverageLapTime(ctx, db.GetAverageLapTimeParams{
+				DriverNumber: lap.DriverNumber,
+				IsPitOutLap:  false,
+				MeetingKey:   lap.MeetingKey,
+				SessionKey:   lap.SessionKey,
+			})
+			if err != nil {
+				return fmt.Errorf("get average lap time: %w", err)
+			}
+
+			// Рассчитываем средний темп на текущем сегменте
+			segment, err := q.GetCurrentSegmentPace(ctx, db.GetCurrentSegmentPaceParams{
+				DriverNumber: lap.DriverNumber,
+				LapNumber:    lap.LapNumber,
+				MeetingKey:   lap.MeetingKey,
+				SessionKey:   lap.SessionKey,
+			})
+			if err != nil {
+				return fmt.Errorf("get segment pace: %w", err)
+			}
+
+			analysis.AverageSegmentPace = segment.AveragePace
+			analysis.LapsInSegment = int(segment.LapCount)
 		}
-
-		analysis.DriverNumber = lap.DriverNumber
-		analysis.CurrentLapTime = lap.LapDuration
-		analysis.LapNumber = lap.LapNumber
-		analysis.MeetingKey = lap.MeetingKey
-		analysis.SessionKey = lap.SessionKey
-
-		// Рассчитываем среднее время круга (исключая пит-стопы)
-		analysis.AverageLapTime, err = q.GetAverageLapTime(ctx, db.GetAverageLapTimeParams{
-			DriverNumber: lap.DriverNumber,
-			IsPitOutLap:  false,
-			MeetingKey:   lap.MeetingKey,
-			SessionKey:   lap.SessionKey,
-		})
-		if err != nil {
-			return fmt.Errorf("get average lap time: %w", err)
-		}
-
-		// Рассчитываем средний темп на текущем сегменте
-		segment, err := q.GetCurrentSegmentPace(ctx, db.GetCurrentSegmentPaceParams{
-			DriverNumber: lap.DriverNumber,
-			LapNumber:    lap.LapNumber,
-			MeetingKey:   lap.MeetingKey,
-			SessionKey:   lap.SessionKey,
-		})
-		if err != nil {
-			return fmt.Errorf("get segment pace: %w", err)
-		}
-
-		analysis.AverageSegmentPace = segment.AveragePace
-		analysis.LapsInSegment = int(segment.LapCount)
-
-		// Сравнение текущего круга со средним
-		if analysis.AverageLapTime > 0 {
-			analysis.ComparisonWithAvg = (analysis.CurrentLapTime - analysis.AverageLapTime) / analysis.AverageLapTime * 100
-		}
-
-		// Определяем тренд
-		analysis.PositionTrend = r.calculateTrend(
-			analysis.CurrentLapTime,
-			analysis.AverageSegmentPace,
-		)
 
 		// Определяем интервалы от следующего гонщика
 		curDriver, err := q.GetDriverStats(ctx, db.GetDriverStatsParams{
@@ -215,20 +202,4 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 		return nil, err
 	}
 	return &analysis, nil
-}
-
-func (r *LapRepository) calculateTrend(current, average float64) string {
-	if average == 0 {
-		return "stable"
-	}
-
-	ratio := (current - average) / average
-	switch {
-	case ratio < -0.03: // >3% лучше
-		return "improving"
-	case ratio > 0.03: // >3% хуже
-		return "declining"
-	default:
-		return "stable"
-	}
 }
