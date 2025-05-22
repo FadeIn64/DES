@@ -21,6 +21,16 @@ type CompleteLap struct {
 	UpdatedAt      pgtype.Timestamptz
 }
 
+type Driver struct {
+	DriverNumber int64
+	TeamKey      pgtype.Int4
+	FullName     string
+	Abbreviation string
+	Country      pgtype.Text
+	DateOfBirth  pgtype.Date
+	Description  string
+}
+
 type DriverPositionsWithIntervalsAndLastLap struct {
 	Position                 int64
 	MeetingKey               int32
@@ -81,6 +91,19 @@ type DriversStatsWithPosition struct {
 	UpdatedAt        pgtype.Timestamptz
 }
 
+type FullDriverDatum struct {
+	Position                 int64
+	MeetingKey               int32
+	SessionKey               int32
+	DriverNumber             int32
+	LapNumber                int32
+	Interval                 float64
+	PredictionLapsToOvertake pgtype.Int4
+	LastLapDuration          float64
+	Pitsops                  pgtype.Int8
+	LastPitLap               interface{}
+}
+
 type Lap struct {
 	MeetingKey       int32
 	SessionKey       int32
@@ -94,4 +117,24 @@ type Lap struct {
 	InfoTime         pgtype.Timestamptz
 	IsPitOutLap      bool
 	UpdatedAt        pgtype.Timestamptz
+}
+
+type Meeting struct {
+	MeetingKey    int64
+	Name          string
+	Description   string
+	Circuit       string
+	Location      string
+	StartDate     pgtype.Timestamptz
+	EndDate       pgtype.Timestamptz
+	Year          int32
+	DashboardLink pgtype.Text
+}
+
+type Team struct {
+	TeamKey     int64
+	Name        string
+	Description string
+	Country     pgtype.Text
+	Color       pgtype.Text
 }
