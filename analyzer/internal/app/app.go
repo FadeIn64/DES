@@ -3,15 +3,17 @@ package app
 import (
 	"DAS/internal/consumers"
 	"DAS/internal/metrics"
+	"DAS/internal/web"
 	"context"
-	"github.com/jackc/pgx/v5/stdlib"
-	"github.com/pressly/goose/v3"
-	"log"
-
 	trmpgx "github.com/avito-tech/go-transaction-manager/pgxv5"
 	"github.com/avito-tech/go-transaction-manager/trm"
 	"github.com/avito-tech/go-transaction-manager/trm/manager"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose/v3"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"log"
+	"net/http"
 
 	"DAS/config"
 	"DAS/internal/repositories"
@@ -24,6 +26,7 @@ type App struct {
 	Repo       *repositories.LapRepository
 	LapHandler *consumers.LapHandler
 	Exporter   *metrics.Exporter
+	Server     web.HttpServer
 }
 
 func NewApp(cfg *config.Config) *App {
@@ -44,6 +47,11 @@ func NewApp(cfg *config.Config) *App {
 		log.Fatal(err)
 	}
 
+	server, err := web.New(cfg.ServerPort, &metricsHandler{pronH: promhttp.Handler()})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return &App{
 		Cfg:        cfg,
 		pool:       pool,
@@ -51,6 +59,7 @@ func NewApp(cfg *config.Config) *App {
 		Repo:       repo,
 		LapHandler: lapHandler,
 		Exporter:   exporter,
+		Server:     server,
 	}
 }
 
@@ -79,4 +88,13 @@ func initTransactionManager(pool *pgxpool.Pool) trm.Manager {
 
 func (a *App) Close() {
 	a.pool.Close()
+}
+
+type metricsHandler struct {
+	pronH http.Handler
+}
+
+func (h metricsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Serving metrics at %s", r.URL.Path)
+	h.pronH.ServeHTTP(w, r)
 }
