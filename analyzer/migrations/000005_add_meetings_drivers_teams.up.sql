@@ -1,6 +1,6 @@
 -- +goose Up
 CREATE TABLE meetings (
-                          meeting_key SERIAL PRIMARY KEY,
+                          meeting_key BIGINT PRIMARY KEY,
                           name TEXT NOT NULL,
                           description text NOT NULL,
                           circuit TEXT NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE meetings (
 );
 
 CREATE TABLE teams (
-                       team_key SERIAL PRIMARY KEY,
+                       team_key BIGINT PRIMARY KEY,
                        name TEXT NOT NULL UNIQUE,
                        description text NOT NULL,
                        country TEXT,
@@ -20,7 +20,7 @@ CREATE TABLE teams (
 );
 
 CREATE TABLE drivers (
-                         driver_number INTEGER PRIMARY KEY,
+                         driver_number BIGINT PRIMARY KEY,
                          team_key INTEGER,
                          full_name TEXT NOT NULL,
                          abbreviation TEXT NOT NULL,
