@@ -6,6 +6,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
@@ -14,8 +16,10 @@ type Querier interface {
 	GetAverageLapTime(ctx context.Context, arg GetAverageLapTimeParams) (float64, error)
 	GetCurrentMeeting(ctx context.Context) (Meeting, error)
 	GetCurrentSegmentPace(ctx context.Context, arg GetCurrentSegmentPaceParams) (GetCurrentSegmentPaceRow, error)
+	GetDriverByNumber(ctx context.Context, driverNumber int64) (Driver, error)
 	GetDriverByPosition(ctx context.Context, arg GetDriverByPositionParams) (DriversStatsWithPosition, error)
 	GetDriverStats(ctx context.Context, arg GetDriverStatsParams) (DriversStatsWithPosition, error)
+	GetDriversByTeam(ctx context.Context, teamKey pgtype.Int4) ([]Driver, error)
 	GetDriversStats(ctx context.Context, arg GetDriversStatsParams) ([]DriversStatsWithPosition, error)
 	GetLap(ctx context.Context, arg GetLapParams) (Lap, error)
 	GetMeetingByKet(ctx context.Context, meetingKey int64) (Meeting, error)
