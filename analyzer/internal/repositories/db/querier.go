@@ -9,13 +9,17 @@ import (
 )
 
 type Querier interface {
+	CreateMeeting(ctx context.Context, arg CreateMeetingParams) error
 	ExecCompletedLapByDriver(ctx context.Context, arg ExecCompletedLapByDriverParams) (int64, error)
 	GetAverageLapTime(ctx context.Context, arg GetAverageLapTimeParams) (float64, error)
+	GetCurrentMeeting(ctx context.Context) (Meeting, error)
 	GetCurrentSegmentPace(ctx context.Context, arg GetCurrentSegmentPaceParams) (GetCurrentSegmentPaceRow, error)
 	GetDriverByPosition(ctx context.Context, arg GetDriverByPositionParams) (DriversStatsWithPosition, error)
 	GetDriverStats(ctx context.Context, arg GetDriverStatsParams) (DriversStatsWithPosition, error)
 	GetDriversStats(ctx context.Context, arg GetDriversStatsParams) ([]DriversStatsWithPosition, error)
 	GetLap(ctx context.Context, arg GetLapParams) (Lap, error)
+	GetMeetingByKet(ctx context.Context, meetingKey int64) (Meeting, error)
+	GetMeetings(ctx context.Context) ([]Meeting, error)
 	MoveCompleteLap(ctx context.Context, arg MoveCompleteLapParams) error
 	UpsertDriversInterval(ctx context.Context, arg UpsertDriversIntervalParams) error
 	UpsertLap(ctx context.Context, arg UpsertLapParams) error
