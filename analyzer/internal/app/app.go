@@ -2,6 +2,7 @@ package app
 
 import (
 	"DAS/internal/consumers"
+	"DAS/internal/controllers"
 	"DAS/internal/metrics"
 	"DAS/internal/web"
 	"context"
@@ -20,16 +21,19 @@ import (
 )
 
 type App struct {
-	Cfg         *config.Config
-	pool        *pgxpool.Pool
-	trManager   trm.Manager
+	Cfg       *config.Config
+	pool      *pgxpool.Pool
+	trManager trm.Manager
+
 	lapRepo     *repositories.LapRepository
 	driverRepo  *repositories.DriverRepository
 	teamRepo    *repositories.TeamRepository
 	meetingRepo *repositories.MeetingRepository
-	LapHandler  *consumers.LapHandler
-	Exporter    *metrics.Exporter
-	Server      web.HttpServer
+
+	LapHandler *consumers.LapHandler
+	Exporter   *metrics.Exporter
+
+	Server web.HttpServer
 }
 
 func NewApp(cfg *config.Config) *App {
@@ -40,6 +44,10 @@ func NewApp(cfg *config.Config) *App {
 	driverRepo := repositories.NewDriverRepository(pool, trManager)
 	teamRepo := repositories.NewTeamRepository(pool, trManager)
 	meetingRepo := repositories.NewMeetingRepository(pool, trManager)
+
+	meetingCtrl := controllers.NewMeetingController(meetingRepo)
+	driverCtrl := controllers.NewDriverController(driverRepo)
+	teamCtrl := controllers.NewTeamController(teamRepo)
 
 	exporter := metrics.NewMetricsExporter()
 	lapHandler := consumers.NewLapHandler(lapRepo, exporter)
@@ -55,7 +63,11 @@ func NewApp(cfg *config.Config) *App {
 		log.Fatal(err)
 	}
 
-	server, err := web.New(cfg.ServerPort, &metricsHandler{pronH: promhttp.Handler()})
+	server, err := web.New(cfg.ServerPort, &metricsHandler{pronH: promhttp.Handler()},
+		meetingCtrl,
+		driverCtrl,
+		teamCtrl,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
