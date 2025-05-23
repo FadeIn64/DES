@@ -20,21 +20,29 @@ import (
 )
 
 type App struct {
-	Cfg        *config.Config
-	pool       *pgxpool.Pool
-	trManager  trm.Manager
-	Repo       *repositories.LapRepository
-	LapHandler *consumers.LapHandler
-	Exporter   *metrics.Exporter
-	Server     web.HttpServer
+	Cfg         *config.Config
+	pool        *pgxpool.Pool
+	trManager   trm.Manager
+	lapRepo     *repositories.LapRepository
+	driverRepo  *repositories.DriverRepository
+	teamRepo    *repositories.TeamRepository
+	meetingRepo *repositories.MeetingRepository
+	LapHandler  *consumers.LapHandler
+	Exporter    *metrics.Exporter
+	Server      web.HttpServer
 }
 
 func NewApp(cfg *config.Config) *App {
 	pool := initDBPool(cfg)
 	trManager := initTransactionManager(pool)
-	repo := repositories.NewLapRepository(pool, trManager)
+
+	lapRepo := repositories.NewLapRepository(pool, trManager)
+	driverRepo := repositories.NewDriverRepository(pool, trManager)
+	teamRepo := repositories.NewTeamRepository(pool, trManager)
+	meetingRepo := repositories.NewMeetingRepository(pool, trManager)
+
 	exporter := metrics.NewMetricsExporter()
-	lapHandler := consumers.NewLapHandler(repo, exporter)
+	lapHandler := consumers.NewLapHandler(lapRepo, exporter)
 
 	db := stdlib.OpenDBFromPool(pool)
 
@@ -53,13 +61,16 @@ func NewApp(cfg *config.Config) *App {
 	}
 
 	return &App{
-		Cfg:        cfg,
-		pool:       pool,
-		trManager:  trManager,
-		Repo:       repo,
-		LapHandler: lapHandler,
-		Exporter:   exporter,
-		Server:     server,
+		Cfg:         cfg,
+		pool:        pool,
+		trManager:   trManager,
+		lapRepo:     lapRepo,
+		driverRepo:  driverRepo,
+		teamRepo:    teamRepo,
+		meetingRepo: meetingRepo,
+		LapHandler:  lapHandler,
+		Exporter:    exporter,
+		Server:      server,
 	}
 }
 
