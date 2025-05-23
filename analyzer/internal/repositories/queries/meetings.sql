@@ -3,7 +3,7 @@ SELECT * FROM meetings
 WHERE start_date <= NOW() AND end_date >= NOW()
 LIMIT 1;
 
--- name: GetMeetingByKet :one
+-- name: GetMeetingByKey :one
 SELECT * from meetings
     WHERE meeting_key = $1;
 

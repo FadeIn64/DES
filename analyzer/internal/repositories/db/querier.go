@@ -23,7 +23,7 @@ type Querier interface {
 	GetDriversByTeam(ctx context.Context, teamKey pgtype.Int4) ([]Driver, error)
 	GetDriversStats(ctx context.Context, arg GetDriversStatsParams) ([]DriversStatsWithPosition, error)
 	GetLap(ctx context.Context, arg GetLapParams) (Lap, error)
-	GetMeetingByKet(ctx context.Context, meetingKey int64) (Meeting, error)
+	GetMeetingByKey(ctx context.Context, meetingKey int64) (Meeting, error)
 	GetMeetings(ctx context.Context) ([]Meeting, error)
 	GetTeamByID(ctx context.Context, teamKey int64) (Team, error)
 	MoveCompleteLap(ctx context.Context, arg MoveCompleteLapParams) error

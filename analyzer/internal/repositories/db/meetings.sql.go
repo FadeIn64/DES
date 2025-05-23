@@ -78,13 +78,13 @@ func (q *Queries) GetCurrentMeeting(ctx context.Context) (Meeting, error) {
 	return i, err
 }
 
-const getMeetingByKet = `-- name: GetMeetingByKet :one
+const getMeetingByKey = `-- name: GetMeetingByKey :one
 SELECT meeting_key, name, description, circuit, location, start_date, end_date, year, dashboard_link from meetings
     WHERE meeting_key = $1
 `
 
-func (q *Queries) GetMeetingByKet(ctx context.Context, meetingKey int64) (Meeting, error) {
-	row := q.db.QueryRow(ctx, getMeetingByKet, meetingKey)
+func (q *Queries) GetMeetingByKey(ctx context.Context, meetingKey int64) (Meeting, error) {
+	row := q.db.QueryRow(ctx, getMeetingByKey, meetingKey)
 	var i Meeting
 	err := row.Scan(
 		&i.MeetingKey,
