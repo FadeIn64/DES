@@ -13,6 +13,7 @@ import (
 
 type Receiver interface {
 	ReceiveData(ctx context.Context, start time.Time) chan error
+	ReceiveAllData(ctx context.Context, start, end time.Time) error
 	Close() error
 }
 
@@ -90,4 +91,21 @@ func (l *lapReceiver) sendData(lap *models.Lap) error {
 
 	_, _, err = l.producer.SendMessage(message)
 	return err
+}
+
+func (l *lapReceiver) ReceiveAllData(ctx context.Context, start, end time.Time) error {
+	laps, err := l.extractor.ExtractLaps(ctx, start, end)
+	if err != nil {
+		return err
+	}
+	log.Printf("Laps: %v", laps)
+
+	for _, lap := range laps {
+		err = l.sendData(&lap)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
