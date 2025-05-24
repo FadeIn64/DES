@@ -12,7 +12,7 @@ import (
 )
 
 var urlFormat = "https://api.openf1.org/v1/laps?session_key=%d&driver_number=%d"
-var sessionKey = 9566
+var sessionKey = 9558
 
 //go:generate go run generate.go
 func main() {
