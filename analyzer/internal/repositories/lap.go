@@ -4,9 +4,11 @@ import (
 	"DAS/internal/repositories/db"
 	"DAS/models"
 	"context"
+	"errors"
 	"fmt"
 	trmpgx "github.com/avito-tech/go-transaction-manager/pgxv5"
 	"github.com/avito-tech/go-transaction-manager/trm"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"math"
@@ -146,7 +148,9 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 			Position:   curDriver.Position - 1,
 		})
 
-		if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil
+		} else if err != nil {
 			return fmt.Errorf("get next driver: %w", err)
 		}
 

@@ -17,8 +17,8 @@ from laps l3 inner join grouped_laps_by_lap_and_cs gllacs
                             and l3.session_key = gllacs.session_key and l3.lap_number = gllacs.lap_number and l3.completed_sectors = gllacs.m_sector;
 
 create view drivers_stats_with_positions as
-    select row_number() over (order by lap_number desc, completed_sectors desc, date_end) as position, * from drivers_stats;
+    select row_number() over (partition by meeting_key, session_key order by lap_number desc, completed_sectors desc, date_end) as position, * from drivers_stats;
 
 -- +goose Down
 drop view drivers_stats_with_positions;
-drop table drivers_stats;
+drop view drivers_stats;
