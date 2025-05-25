@@ -27,6 +27,6 @@ type DriversRaceData struct {
 	LastPitLap               interface{}
 	FullName                 string
 	Abbreviation             string
-	Name                     string
+	TeamName                 string
 	Color                    string
 }
