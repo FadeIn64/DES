@@ -21,6 +21,8 @@ type Querier interface {
 	GetDriverByPosition(ctx context.Context, arg GetDriverByPositionParams) (DriversStatsWithPosition, error)
 	GetDriverStats(ctx context.Context, arg GetDriverStatsParams) (DriversStatsWithPosition, error)
 	GetDriversByTeam(ctx context.Context, teamKey pgtype.Int4) ([]Driver, error)
+	GetDriversRaceDataByDriver(ctx context.Context, driverNumber int32) ([]FullDriverDatum, error)
+	GetDriversRaceDataByMeeting(ctx context.Context, meetingKey int32) ([]FullDriverDatum, error)
 	GetDriversStats(ctx context.Context, arg GetDriversStatsParams) ([]DriversStatsWithPosition, error)
 	GetLap(ctx context.Context, arg GetLapParams) (Lap, error)
 	GetMeetingByKey(ctx context.Context, meetingKey int64) (Meeting, error)

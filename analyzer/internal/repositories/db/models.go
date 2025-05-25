@@ -8,6 +8,19 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type AllDriversStat struct {
+	Position                 int64
+	MeetingKey               int32
+	SessionKey               int32
+	DriverNumber             int32
+	LapNumber                int32
+	Interval                 float64
+	PredictionLapsToOvertake pgtype.Int4
+	LastLapDuration          float64
+	Pitsops                  pgtype.Int8
+	LastPitLap               interface{}
+}
+
 type CompleteLap struct {
 	MeetingKey     int32
 	SessionKey     int32
@@ -102,6 +115,10 @@ type FullDriverDatum struct {
 	LastLapDuration          float64
 	Pitsops                  pgtype.Int8
 	LastPitLap               interface{}
+	FullName                 string
+	Abbreviation             string
+	Name                     string
+	Color                    pgtype.Text
 }
 
 type Lap struct {

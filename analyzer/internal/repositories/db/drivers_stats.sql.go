@@ -75,6 +75,86 @@ func (q *Queries) GetDriverStats(ctx context.Context, arg GetDriverStatsParams) 
 	return i, err
 }
 
+const getDriversRaceDataByDriver = `-- name: GetDriversRaceDataByDriver :many
+select position, meeting_key, session_key, driver_number, lap_number, interval, prediction_laps_to_overtake, last_lap_duration, pitsops, last_pit_lap, full_name, abbreviation, name, color from full_driver_data
+    where driver_number = $1
+`
+
+func (q *Queries) GetDriversRaceDataByDriver(ctx context.Context, driverNumber int32) ([]FullDriverDatum, error) {
+	rows, err := q.db.Query(ctx, getDriversRaceDataByDriver, driverNumber)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FullDriverDatum
+	for rows.Next() {
+		var i FullDriverDatum
+		if err := rows.Scan(
+			&i.Position,
+			&i.MeetingKey,
+			&i.SessionKey,
+			&i.DriverNumber,
+			&i.LapNumber,
+			&i.Interval,
+			&i.PredictionLapsToOvertake,
+			&i.LastLapDuration,
+			&i.Pitsops,
+			&i.LastPitLap,
+			&i.FullName,
+			&i.Abbreviation,
+			&i.Name,
+			&i.Color,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getDriversRaceDataByMeeting = `-- name: GetDriversRaceDataByMeeting :many
+select position, meeting_key, session_key, driver_number, lap_number, interval, prediction_laps_to_overtake, last_lap_duration, pitsops, last_pit_lap, full_name, abbreviation, name, color from full_driver_data
+    where meeting_key = $1
+`
+
+func (q *Queries) GetDriversRaceDataByMeeting(ctx context.Context, meetingKey int32) ([]FullDriverDatum, error) {
+	rows, err := q.db.Query(ctx, getDriversRaceDataByMeeting, meetingKey)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FullDriverDatum
+	for rows.Next() {
+		var i FullDriverDatum
+		if err := rows.Scan(
+			&i.Position,
+			&i.MeetingKey,
+			&i.SessionKey,
+			&i.DriverNumber,
+			&i.LapNumber,
+			&i.Interval,
+			&i.PredictionLapsToOvertake,
+			&i.LastLapDuration,
+			&i.Pitsops,
+			&i.LastPitLap,
+			&i.FullName,
+			&i.Abbreviation,
+			&i.Name,
+			&i.Color,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getDriversStats = `-- name: GetDriversStats :many
 select position, meeting_key, session_key, driver_number, completed_sectors, date_start, lap_duration, lap_number, sector_duration, date_end, info_time, is_pit_out_lap, updated_at from drivers_stats_with_positions
 where meeting_key = $1 and session_key = $2
