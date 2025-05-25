@@ -16,6 +16,7 @@ select id, meeting_key, session_key, driver_number, date_start, lap_duration, la
 from laps
 where info_time >= $1
   and info_time <= $2
+order by info_time
 `
 
 type GetLapsStartDateBetweenParams struct {

@@ -5,4 +5,5 @@ values ($1, $2, $3,$4, $5, $6,$7, $8, $9);
 select *
 from laps
 where info_time >= $1
-  and info_time <= $2;
+  and info_time <= $2
+order by info_time;
