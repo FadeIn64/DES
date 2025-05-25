@@ -20,6 +20,7 @@ func NewMeetingController(meetingRepo *repositories.MeetingRepository) Controlle
 func (m MeetingController) Register(r *gin.Engine) {
 	r.GET("/meetings", m.GetMeetings)
 	r.GET("/meetings/:id", m.GetMeeting)
+	r.GET("/meetings/:id/drivers_stats", m.GetDriversStats)
 }
 
 func (m MeetingController) GetMeetings(c *gin.Context) {
@@ -58,4 +59,28 @@ func (m MeetingController) GetMeeting(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, meeting)
+}
+
+func (m MeetingController) GetDriversStats(c *gin.Context) {
+	idParam := c.Param("id")
+	if idParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("id is required"))
+		return
+	}
+
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	stats, err := m.MeetingRepo.GetDriversStatsByMeeting(c, int(id))
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.AbortWithStatus(http.StatusNotFound)
+		}
+		c.AbortWithError(http.StatusInternalServerError, err)
+	}
+
+	c.JSON(http.StatusOK, stats)
 }

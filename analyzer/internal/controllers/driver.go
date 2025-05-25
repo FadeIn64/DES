@@ -20,6 +20,7 @@ func NewDriverController(driverRepo *repositories.DriverRepository) Controller {
 func (d DriverController) Register(r *gin.Engine) {
 	r.GET("/drivers/:id", d.GetDriver)
 	r.GET("/drivers", d.GetDriversByTeam)
+	r.GET("/drivers/:id/stats", d.GetDriversStats)
 }
 
 func (d DriverController) GetDriver(c *gin.Context) {
@@ -72,4 +73,28 @@ func (d DriverController) GetDriversByTeam(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, drivers)
+}
+
+func (d DriverController) GetDriversStats(c *gin.Context) {
+	idParam := c.Param("id")
+	if idParam == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("id is required"))
+		return
+	}
+
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	stats, err := d.DriverRepo.GetDriversStatsByDriver(c, int(id))
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.AbortWithStatus(http.StatusNotFound)
+		}
+		c.AbortWithError(http.StatusInternalServerError, err)
+	}
+
+	c.JSON(http.StatusOK, stats)
 }
