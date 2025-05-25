@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Driver struct {
 	DriverNumber int       `json:"driver_number"`
@@ -10,4 +12,21 @@ type Driver struct {
 	Country      string    `json:"country"`
 	DateOfBirth  time.Time `json:"date_of_birth"`
 	Description  string    `json:"description"`
+}
+
+type DriversRaceData struct {
+	Position                 int
+	MeetingKey               int
+	SessionKey               int
+	DriverNumber             int
+	LapNumber                int
+	Interval                 float64
+	PredictionLapsToOvertake int
+	LastLapDuration          float64
+	Pitsops                  int
+	LastPitLap               interface{}
+	FullName                 string
+	Abbreviation             string
+	Name                     string
+	Color                    string
 }
