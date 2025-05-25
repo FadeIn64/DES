@@ -9,7 +9,6 @@ require (
 	github.com/avito-tech/go-transaction-manager v1.5.0
 	github.com/avito-tech/go-transaction-manager/trm/v2 v2.0.0
 	github.com/gin-contrib/cors v1.7.5
-	github.com/gin-contrib/requestid v1.0.5
 	github.com/gin-gonic/gin v1.10.1
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/pressly/goose/v3 v3.24.3
@@ -36,7 +35,6 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
