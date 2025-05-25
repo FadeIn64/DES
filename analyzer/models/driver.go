@@ -15,18 +15,18 @@ type Driver struct {
 }
 
 type DriversRaceData struct {
-	Position                 int
-	MeetingKey               int
-	SessionKey               int
-	DriverNumber             int
-	LapNumber                int
-	Interval                 float64
-	PredictionLapsToOvertake int
-	LastLapDuration          float64
-	Pitsops                  int
-	LastPitLap               interface{}
-	FullName                 string
-	Abbreviation             string
-	TeamName                 string
-	Color                    string
+	Position                 int         `json:"position"`
+	MeetingKey               int         `json:"meeting_key"`
+	SessionKey               int         `json:"session_key"`
+	DriverNumber             int         `json:"driver_number"`
+	LapNumber                int         `json:"lap_number"`
+	Interval                 float64     `json:"interval"`
+	PredictionLapsToOvertake int         `json:"prediction_laps_to_overtake"`
+	LastLapDuration          float64     `json:"last_lap_duration"`
+	Pitsops                  int         `json:"pitsops"`
+	LastPitLap               interface{} `json:"last_pit_lap"`
+	FullName                 string      `json:"full_name"`
+	Abbreviation             string      `json:"abbreviation"`
+	TeamName                 string      `json:"team_name"`
+	Color                    string      `json:"color"`
 }
