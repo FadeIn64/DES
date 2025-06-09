@@ -7,9 +7,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "F1 Dashboard",
-  description: "Формула-1 - гонки, гонщики и результаты",
-    generator: 'v0.dev'
+  title: "Race Dashboard",
+  description: "Вся ифнормация о текущих и прошедших гонках"
 }
 
 export default function RootLayout({
