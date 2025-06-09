@@ -5,6 +5,7 @@ import (
 	"DAS/models"
 	"context"
 	"github.com/avito-tech/go-transaction-manager/trm"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -54,4 +55,18 @@ func (r *TeamRepository) GetAll(ctx context.Context) ([]*models.Team, error) {
 	}
 
 	return teams, nil
+}
+
+func (r *TeamRepository) Save(ctx context.Context, team *models.Team) error {
+	q := db.New(r.db)
+
+	args := db.UpsertTeamParams{
+		TeamKey:     int64(team.TeamKey),
+		Name:        team.Name,
+		Description: team.Description,
+		Country:     pgtype.Text{String: team.Country, Valid: true},
+		Color:       pgtype.Text{String: team.Color, Valid: true},
+	}
+
+	return q.UpsertTeam(ctx, args)
 }

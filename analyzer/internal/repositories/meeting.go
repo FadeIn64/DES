@@ -5,6 +5,7 @@ import (
 	"DAS/models"
 	"context"
 	"github.com/avito-tech/go-transaction-manager/trm"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -90,4 +91,22 @@ func (r *MeetingRepository) GetDriversStatsByMeeting(ctx context.Context, meetin
 		}
 	}
 	return meetings, nil
+}
+
+func (r *MeetingRepository) SaveMeeting(ctx context.Context, meeting *models.Meeting) error {
+	q := db.New(r.db)
+
+	args := db.UpsertMeetingParams{
+		MeetingKey:    int64(meeting.MeetingKey),
+		Name:          meeting.Name,
+		Description:   meeting.Description,
+		Circuit:       meeting.Circuit,
+		Location:      meeting.Location,
+		StartDate:     pgtype.Timestamptz{Time: meeting.StartDate, Valid: true},
+		EndDate:       pgtype.Timestamptz{Time: meeting.EndDate, Valid: true},
+		Year:          int32(meeting.Year),
+		DashboardLink: pgtype.Text{String: meeting.DashboardLink, Valid: true},
+	}
+
+	return q.UpsertMeeting(ctx, args)
 }

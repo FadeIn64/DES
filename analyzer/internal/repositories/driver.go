@@ -92,3 +92,19 @@ func (repo *DriverRepository) GetDriversStatsByDriver(ctx context.Context, drive
 	}
 	return meetings, nil
 }
+
+func (repo *DriverRepository) SaveDriver(ctx context.Context, driver *models.Driver) error {
+	q := db.New(repo.db)
+
+	args := db.UpsertDriversParams{
+		DriverNumber: int64(driver.DriverNumber),
+		TeamKey:      pgtype.Int4{Int32: int32(driver.TeamKey), Valid: true},
+		FullName:     driver.FullName,
+		Abbreviation: driver.Abbreviation,
+		Country:      pgtype.Text{String: driver.Country, Valid: true},
+		DateOfBirth:  pgtype.Date{Time: driver.DateOfBirth, Valid: true},
+		Description:  driver.Description,
+	}
+
+	return q.UpsertDrivers(ctx, args)
+}
