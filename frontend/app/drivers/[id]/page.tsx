@@ -181,169 +181,169 @@ export default async function DriverPage({ params }: { params: { id: string } })
 
     // Fetch meeting data for each race result
     const raceResults = await Promise.all(
-      driverStats.map(async (stat) => {
-        const meeting = await getMeeting(stat.meeting_key)
-        return {
-          ...stat,
-          meeting,
-        }
-      }),
+        driverStats.map(async (stat) => {
+          const meeting = await getMeeting(stat.meeting_key)
+          return {
+            ...stat,
+            meeting,
+          }
+        }),
     )
 
     // Sort by meeting end date (latest first - inverted)
     const sortedResults = raceResults
-      .filter((result) => result.meeting !== null)
-      .sort((a, b) => {
-        if (!a.meeting || !b.meeting) return 0
-        return new Date(b.meeting.end_date).getTime() - new Date(a.meeting.end_date).getTime()
-      })
+        .filter((result) => result.meeting !== null)
+        .sort((a, b) => {
+          if (!a.meeting || !b.meeting) return 0
+          return new Date(b.meeting.end_date).getTime() - new Date(a.meeting.end_date).getTime()
+        })
 
     const birthDate = new Date(driver.date_of_birth)
 
     return (
-      <div className="container mx-auto py-10">
-        {/* Navigation Button */}
-        <div className="mb-6 flex items-center justify-between">
-          <Button asChild variant="outline" className="flex items-center gap-2">
-            <Link href="/">
-              <ArrowLeft className="w-4 h-4" />
-              На главную
-            </Link>
-          </Button>
-          <ThemeToggle />
-        </div>
+        <div className="container mx-auto py-10">
+          {/* Navigation Button */}
+          <div className="mb-6 flex items-center justify-between">
+            <Button asChild variant="outline" className="flex items-center gap-2">
+              <Link href="/">
+                <ArrowLeft className="w-4 h-4" />
+                На главную
+              </Link>
+            </Button>
+            <ThemeToggle />
+          </div>
 
-        <div className="space-y-6">
-          {/* Driver Info Card */}
-          <Card className="max-w-3xl mx-auto border-slate-200 dark:border-slate-700">
-            <CardHeader className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-2xl md:text-3xl">{driver.full_name}</CardTitle>
-                  <CardDescription className="text-lg">
-                    Номер: {driver.driver_number} | Аббревиатура: {driver.abbreviation}
-                  </CardDescription>
-                </div>
-                <div
-                  className="text-white text-4xl font-bold w-16 h-16 flex items-center justify-center rounded-full"
-                  style={{ backgroundColor: team.color }}
-                >
-                  {driver.driver_number}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Flag className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-                    <span className="font-medium">Страна:</span> {driver.country}
+          <div className="space-y-6">
+            {/* Driver Info Card */}
+            <Card className="max-w-3xl mx-auto border-slate-200 dark:border-slate-700">
+              <CardHeader className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-3xl md:text-4xl">{driver.full_name}</CardTitle>
+                    <CardDescription className="text-xl">
+                      Номер: {driver.driver_number} | Аббревиатура: {driver.abbreviation}
+                    </CardDescription>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-                    <span className="font-medium">Дата рождения:</span>{" "}
-                    {format(birthDate, "d MMMM yyyy", { locale: ru })}
+                  <div
+                      className="text-white text-4xl font-bold w-16 h-16 flex items-center justify-center rounded-full"
+                      style={{ backgroundColor: team.color }}
+                  >
+                    {driver.driver_number}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-                    <span className="font-medium">Команда:</span>
-                    <span style={{ color: team.color }} className="font-semibold">
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-lg">
+                      <Flag className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+                      <span className="font-medium">Страна:</span> {driver.country}
+                    </div>
+                    <div className="flex items-center gap-2 text-lg">
+                      <User className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+                      <span className="font-medium">Дата рождения:</span>{" "}
+                      {format(birthDate, "d MMMM yyyy", { locale: ru })}
+                    </div>
+                    <div className="flex items-center gap-2 text-lg">
+                      <Users className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+                      <span className="font-medium">Команда:</span>
+                      <span style={{ color: team.color }} className="font-semibold">
                       {team.name}
                     </span>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-xl mb-2">Описание</h3>
+                    <p className="text-slate-700 dark:text-slate-300 mb-4 text-lg">{driver.description}</p>
+
+                    <h4 className="font-medium text-lg mb-2">О команде</h4>
+                    <p className="text-slate-600 dark:text-slate-400 text-lg">{team.description}</p>
+                    <p className="text-slate-500 dark:text-slate-500 text-sm mt-1">Страна команды: {team.country}</p>
                   </div>
                 </div>
-                <div>
-                  <h3 className="font-medium text-lg mb-2">Описание</h3>
-                  <p className="text-slate-700 dark:text-slate-300 mb-4">{driver.description}</p>
-
-                  <h4 className="font-medium text-base mb-2">О команде</h4>
-                  <p className="text-slate-600 dark:text-slate-400 text-sm">{team.description}</p>
-                  <p className="text-slate-500 dark:text-slate-500 text-xs mt-1">Страна команды: {team.country}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Race Results Card */}
-          {sortedResults.length > 0 && (
-            <Card className="max-w-3xl mx-auto border-slate-200 dark:border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-xl">Результаты последних гонок</CardTitle>
-                <CardDescription>
-                  Результаты выступлений в обратном хронологическом порядке ({sortedResults.length} гонок)
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {sortedResults.map((result) => {
-                    if (!result.meeting) return null
-
-                    const isLive = isRaceLive(result.meeting)
-                    const countryFlag = getCountryFlag(result.meeting.location)
-
-                    return (
-                      <Link key={result.meeting_key} href={`/meetings/${result.meeting_key}`}>
-                        <div
-                          className={`p-4 rounded-lg border-2 cursor-pointer hover:shadow-md dark:hover:shadow-lg transition-all ${getPositionStyle(result.position)}`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
-                                <div className="flex items-center gap-2">
-                                  {getPositionIcon(result.position)}
-                                  <span className="text-2xl font-bold">P{result.position}</span>
-                                </div>
-                                {isLive && (
-                                  <Badge variant="destructive" className="animate-pulse">
-                                    <Radio className="w-3 h-3 mr-1" />
-                                    LIVE
-                                  </Badge>
-                                )}
-                              </div>
-
-                              <h4 className="font-semibold text-lg mb-1">{result.meeting.name}</h4>
-
-                              <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
-                                <div className="flex items-center gap-1">
-                                  <MapPin className="w-4 h-4" />
-                                  <span>{result.meeting.circuit}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <span className="text-base">{countryFlag}</span>
-                                  <span>{result.meeting.location}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Calendar className="w-4 h-4" />
-                                  <span>{format(new Date(result.meeting.end_date), "d MMM yyyy", { locale: ru })}</span>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-500 mt-2">
-                                <span>Кругов: {result.lap_number}</span>
-                                <span>Пит-стопов: {result.pitsops}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    )
-                  })}
-                </div>
               </CardContent>
             </Card>
-          )}
 
-          {sortedResults.length === 0 && (
-            <Card className="max-w-3xl mx-auto border-slate-200 dark:border-slate-700">
-              <CardContent className="pt-6 text-center">
-                <Trophy className="w-12 h-12 text-slate-400 dark:text-slate-500 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Нет данных о результатах</h3>
-                <p className="text-slate-600 dark:text-slate-400">Результаты гонок для этого гонщика пока недоступны</p>
-              </CardContent>
-            </Card>
-          )}
+            {/* Race Results Card */}
+            {sortedResults.length > 0 && (
+                <Card className="max-w-3xl mx-auto border-slate-200 dark:border-slate-700">
+                  <CardHeader>
+                    <CardTitle className="text-2xl">Результаты последних гонок</CardTitle>
+                    <CardDescription>
+                      Результаты выступлений в обратном хронологическом порядке ({sortedResults.length} гонок)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {sortedResults.map((result) => {
+                        if (!result.meeting) return null
+
+                        const isLive = isRaceLive(result.meeting)
+                        const countryFlag = getCountryFlag(result.meeting.location)
+
+                        return (
+                            <Link key={result.meeting_key} href={`/meetings/${result.meeting_key}`}>
+                              <div
+                                  className={`p-4 rounded-lg border-2 cursor-pointer hover:shadow-md dark:hover:shadow-lg transition-all ${getPositionStyle(result.position)}`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-3 mb-2">
+                                      <div className="flex items-center gap-2">
+                                        {getPositionIcon(result.position)}
+                                        <span className="text-2xl font-bold">P{result.position}</span>
+                                      </div>
+                                      {isLive && (
+                                          <Badge variant="destructive" className="animate-pulse">
+                                            <Radio className="w-3 h-3 mr-1" />
+                                            LIVE
+                                          </Badge>
+                                      )}
+                                    </div>
+
+                                    <h4 className="font-semibold text-xl mb-1">{result.meeting.name}</h4>
+
+                                    <div className="flex items-center gap-4 text-base text-slate-600 dark:text-slate-400">
+                                      <div className="flex items-center gap-1">
+                                        <MapPin className="w-4 h-4" />
+                                        <span>{result.meeting.circuit}</span>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-base">{countryFlag}</span>
+                                        <span>{result.meeting.location}</span>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        <Calendar className="w-4 h-4" />
+                                        <span>{format(new Date(result.meeting.end_date), "d MMM yyyy", { locale: ru })}</span>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-500 mt-2">
+                                      <span>Кругов: {result.lap_number}</span>
+                                      <span>Пит-стопов: {result.pitsops}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </Link>
+                        )
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+            )}
+
+            {sortedResults.length === 0 && (
+                <Card className="max-w-3xl mx-auto border-slate-200 dark:border-slate-700">
+                  <CardContent className="pt-6 text-center">
+                    <Trophy className="w-12 h-12 text-slate-400 dark:text-slate-500 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium mb-2">Нет данных о результатах</h3>
+                    <p className="text-slate-600 dark:text-slate-400">Результаты гонок для этого гонщика пока недоступны</p>
+                  </CardContent>
+                </Card>
+            )}
+          </div>
         </div>
-      </div>
     )
   } catch (error) {
     console.error("Error in DriverPage:", error)

@@ -25,21 +25,27 @@ export function YearFilter({ availableYears, selectedYear }: YearFilterProps) {
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
-      <Button variant={selectedYear === null ? "default" : "outline"} size="sm" onClick={() => handleYearChange(null)}>
-        Все годы
-      </Button>
-
-      {availableYears.map((year) => (
+      <div className="flex flex-wrap gap-2">
         <Button
-          key={year}
-          variant={selectedYear === year ? "default" : "outline"}
-          size="sm"
-          onClick={() => handleYearChange(year)}
+            variant={selectedYear === null ? "default" : "outline"}
+            size="default"
+            className="text-base"
+            onClick={() => handleYearChange(null)}
         >
-          {year}
+          Все годы
         </Button>
-      ))}
-    </div>
+
+        {availableYears.map((year) => (
+            <Button
+                key={year}
+                variant={selectedYear === year ? "default" : "outline"}
+                size="default"
+                className="text-base"
+                onClick={() => handleYearChange(year)}
+            >
+              {year}
+            </Button>
+        ))}
+      </div>
   )
 }

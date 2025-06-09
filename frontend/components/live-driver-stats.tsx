@@ -104,101 +104,101 @@ export function LiveDriverStats({ meetingId, initialData, isLive }: LiveDriverSt
   }
 
   return (
-    <div className="border-t border-slate-200 dark:border-slate-700">
-      <div className="flex items-center justify-between p-6 pb-3">
-        <div>
-          <h3 className="text-xl font-semibold">Позиции гонщиков</h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            {isLive ? "Данные обновляются в реальном времени" : "Текущие позиции в гонке"}
-          </p>
-        </div>
-        {isLive && (
-          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
-            <span>
-              Обновлено:{" "}
-              {lastUpdated.toLocaleTimeString("ru-RU", {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              })}
-            </span>
+      <div className="border-t border-slate-200 dark:border-slate-700">
+        <div className="flex items-center justify-between p-6 pb-3">
+          <div>
+            <h3 className="text-2xl font-semibold">Позиции гонщиков</h3>
+            <p className="text-base text-slate-600 dark:text-slate-400">
+              {isLive ? "Данные обновляются в реальном времени" : "Текущие позиции в гонке"}
+            </p>
           </div>
-        )}
-      </div>
+          {isLive && (
+              <div className="flex items-center gap-2 text-base text-slate-500 dark:text-slate-400">
+                <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                <span>
+              Обновлено:{" "}
+                  {lastUpdated.toLocaleTimeString("ru-RU", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  })}
+            </span>
+              </div>
+          )}
+        </div>
 
-      <div className="px-6 pb-6">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-slate-200 dark:border-slate-700">
-                <TableHead className="w-20">Позиция</TableHead>
-                <TableHead className="w-20">Номер</TableHead>
-                <TableHead>Гонщик</TableHead>
-                <TableHead>Команда</TableHead>
-                <TableHead className="text-right">Круг</TableHead>
-                <TableHead className="text-right">Интервал</TableHead>
-                <TableHead className="text-right">Пит-стопы</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {driverStats.map((driver) => (
-                <TableRow
-                  key={driver.driver_number}
-                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-slate-200 dark:border-slate-700 ${isRefreshing ? "opacity-75" : ""}`}
-                >
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {getPositionIcon(driver.position)}
-                      <span className={getPositionStyle(driver.position)}>{driver.position}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Link href={`/drivers/${driver.driver_number}`}>
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold cursor-pointer hover:scale-110 transition-transform"
-                        style={{ backgroundColor: driver.color }}
-                      >
-                        {driver.driver_number}
-                      </div>
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    <Link
-                      href={`/drivers/${driver.driver_number}`}
-                      className="hover:text-red-600 dark:hover:text-red-400 transition-colors"
+        <div className="px-6 pb-6">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-slate-200 dark:border-slate-700">
+                  <TableHead className="w-20 text-base">Позиция</TableHead>
+                  <TableHead className="w-20 text-base">Номер</TableHead>
+                  <TableHead className="text-base">Гонщик</TableHead>
+                  <TableHead className="text-base">Команда</TableHead>
+                  <TableHead className="text-right text-base">Круг</TableHead>
+                  <TableHead className="text-right text-base">Интервал</TableHead>
+                  <TableHead className="text-right text-base">Пит-стопы</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {driverStats.map((driver) => (
+                    <TableRow
+                        key={driver.driver_number}
+                        className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-slate-200 dark:border-slate-700 ${isRefreshing ? "opacity-75" : ""}`}
                     >
-                      <div className="cursor-pointer">
-                        <div className="font-medium">{driver.full_name}</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">{driver.abbreviation}</div>
-                      </div>
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    <Link href={`/drivers/${driver.driver_number}`} className="hover:opacity-80 transition-opacity">
-                      <span style={{ color: driver.color }} className="font-medium cursor-pointer">
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {getPositionIcon(driver.position)}
+                          <span className={getPositionStyle(driver.position)}>{driver.position}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Link href={`/drivers/${driver.driver_number}`}>
+                          <div
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold cursor-pointer hover:scale-110 transition-transform"
+                              style={{ backgroundColor: driver.color }}
+                          >
+                            {driver.driver_number}
+                          </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                            href={`/drivers/${driver.driver_number}`}
+                            className="hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                        >
+                          <div className="cursor-pointer">
+                            <div className="font-medium text-lg">{driver.full_name}</div>
+                            <div className="text-base text-slate-500 dark:text-slate-400">{driver.abbreviation}</div>
+                          </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link href={`/drivers/${driver.driver_number}`} className="hover:opacity-80 transition-opacity">
+                      <span style={{ color: driver.color }} className="font-medium cursor-pointer text-lg">
                         {driver.team_name}
                       </span>
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-right">{driver.lap_number}</TableCell>
-                  <TableCell className="text-right">
-                    {driver.interval > 0 ? `+${driver.interval.toFixed(3)}` : driver.interval.toFixed(3)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div>
-                      <div>{driver.pitsops}</div>
-                      {driver.last_pit_lap > 0 && (
-                        <div className="text-xs text-slate-500 dark:text-slate-400">Круг {driver.last_pit_lap}</div>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="text-right">{driver.lap_number}</TableCell>
+                      <TableCell className="text-right">
+                        {driver.interval > 0 ? `+${driver.interval.toFixed(3)}` : driver.interval.toFixed(3)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div>
+                          <div>{driver.pitsops}</div>
+                          {driver.last_pit_lap > 0 && (
+                              <div className="text-sm text-slate-500 dark:text-slate-400">Круг {driver.last_pit_lap}</div>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </div>
-    </div>
   )
 }

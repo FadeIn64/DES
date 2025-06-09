@@ -105,127 +105,127 @@ export default async function MeetingPage({ params }: { params: { id: string } }
     const hasDriverStats = driverStats.length > 0
 
     return (
-      <div className="container mx-auto py-10">
-        {/* Navigation Button */}
-        <div className="mb-6 flex items-center justify-between">
-          <Button asChild variant="outline" className="flex items-center gap-2">
-            <Link href="/">
-              <ArrowLeft className="w-4 h-4" />
-              На главную
-            </Link>
-          </Button>
-          <ThemeToggle />
-        </div>
+        <div className="container mx-auto py-10">
+          {/* Navigation Button */}
+          <div className="mb-6 flex items-center justify-between">
+            <Button asChild variant="outline" className="flex items-center gap-2">
+              <Link href="/">
+                <ArrowLeft className="w-4 h-4" />
+                На главную
+              </Link>
+            </Button>
+            <ThemeToggle />
+          </div>
 
-        <Card className="max-w-4xl mx-auto border-slate-200 dark:border-slate-700">
-          <CardHeader className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-950/20 dark:to-red-900/20 border-b border-slate-200 dark:border-slate-700">
-            <div className="flex items-start justify-between">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <CardTitle className="text-2xl md:text-3xl">{meeting.name}</CardTitle>
-                  <Badge variant="secondary" className="text-sm">
-                    {meeting.year}
-                  </Badge>
-                </div>
-                <CardDescription className="text-lg">{meeting.description}</CardDescription>
-                {isLive && (
-                  <div className="flex items-center gap-2 mt-3">
-                    <Badge variant="destructive" className="animate-pulse">
-                      <Radio className="w-3 h-3 mr-1" />
-                      Гонка сейчас идет
+          <Card className="max-w-4xl mx-auto border-slate-200 dark:border-slate-700">
+            <CardHeader className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-950/20 dark:to-red-900/20 border-b border-slate-200 dark:border-slate-700">
+              <div className="flex items-start justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <CardTitle className="text-3xl md:text-4xl">{meeting.name}</CardTitle>
+                    <Badge variant="secondary" className="text-base">
+                      {meeting.year}
                     </Badge>
                   </div>
-                )}
-              </div>
-              <div className="bg-red-600 text-white text-2xl font-bold w-16 h-16 flex items-center justify-center rounded-full">
-                <Flag className="w-8 h-8" />
-              </div>
-            </div>
-          </CardHeader>
-
-          <CardContent className="pt-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-                  <span className="font-medium">Трасса:</span> {meeting.circuit}
+                  <CardDescription className="text-xl">{meeting.description}</CardDescription>
+                  {isLive && (
+                      <div className="flex items-center gap-2 mt-3">
+                        <Badge variant="destructive" className="animate-pulse">
+                          <Radio className="w-3 h-3 mr-1" />
+                          Гонка сейчас идет
+                        </Badge>
+                      </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-                  <span className="font-medium">Местоположение:</span> {meeting.location}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-                  <span className="font-medium">Начало:</span>
-                  {format(startDate, "d MMMM yyyy", { locale: ru })}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-slate-500 dark:text-slate-400" />
-                  <span className="font-medium">Окончание:</span>
-                  {format(endDate, "d MMMM yyyy", { locale: ru })}
+                <div className="bg-red-600 text-white text-2xl font-bold w-16 h-16 flex items-center justify-center rounded-full">
+                  <Flag className="w-8 h-8" />
                 </div>
               </div>
+            </CardHeader>
 
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium text-lg mb-2">Продолжительность</h3>
-                  <p className="text-slate-700 dark:text-slate-300">
-                    {Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))} дней
-                  </p>
+            <CardContent className="pt-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-lg">
+                    <MapPin className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+                    <span className="font-medium">Трасса:</span> {meeting.circuit}
+                  </div>
+                  <div className="flex items-center gap-2 text-lg">
+                    <MapPin className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+                    <span className="font-medium">Местоположение:</span> {meeting.location}
+                  </div>
+                  <div className="flex items-center gap-2 text-lg">
+                    <Calendar className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+                    <span className="font-medium">Начало:</span>
+                    {format(startDate, "d MMMM yyyy", { locale: ru })}
+                  </div>
+                  <div className="flex items-center gap-2 text-lg">
+                    <Calendar className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+                    <span className="font-medium">Окончание:</span>
+                    {format(endDate, "d MMMM yyyy", { locale: ru })}
+                  </div>
                 </div>
 
-                {isLive && (
-                  <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                    <h4 className="font-medium text-red-800 dark:text-red-200 mb-2 flex items-center gap-2">
-                      <Radio className="w-4 h-4 animate-pulse" />
-                      Прямая трансляция
-                    </h4>
-                    <p className="text-red-700 dark:text-red-300 text-sm mb-3">
-                      Гонка проходит прямо сейчас! Не пропустите захватывающие моменты.
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-medium text-xl mb-2">Продолжительность</h3>
+                    <p className="text-slate-700 dark:text-slate-300 text-lg">
+                      {Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))} дней
                     </p>
-                    <Button asChild className="w-full bg-red-600 hover:bg-red-700">
-                      <a
-                        href={meeting.dashboard_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        Следить в прямом эфире
-                      </a>
-                    </Button>
                   </div>
-                )}
 
-                {!isLive && meeting.dashboard_link.trim() !== "" && (
-                  <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-                    <h4 className="font-medium text-slate-800 dark:text-slate-200 mb-2">Дополнительная информация</h4>
-                    <Button asChild variant="outline" className="w-full">
-                      <a
-                        href={meeting.dashboard_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        Перейти к дашборду
-                      </a>
-                    </Button>
-                  </div>
-                )}
+                  {isLive && (
+                      <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                        <h4 className="font-medium text-red-800 dark:text-red-200 mb-2 flex items-center gap-2">
+                          <Radio className="w-4 h-4 animate-pulse" />
+                          Прямая трансляция
+                        </h4>
+                        <p className="text-red-700 dark:text-red-300 text-base mb-3">
+                          Гонка проходит прямо сейчас! Не пропустите захватывающие моменты.
+                        </p>
+                        <Button asChild className="w-full bg-red-600 hover:bg-red-700">
+                          <a
+                              href={meeting.dashboard_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center gap-2"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            Следить в прямом эфире
+                          </a>
+                        </Button>
+                      </div>
+                  )}
+
+                  {!isLive && meeting.dashboard_link.trim() !== "" && (
+                      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                        <h4 className="font-medium text-slate-800 dark:text-slate-200 mb-2">Дополнительная информация</h4>
+                        <Button asChild variant="outline" className="w-full">
+                          <a
+                              href={meeting.dashboard_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center gap-2"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            Перейти к дашборду
+                          </a>
+                        </Button>
+                      </div>
+                  )}
+                </div>
               </div>
-            </div>
-          </CardContent>
+            </CardContent>
 
-          {hasDriverStats && (
-            <LiveDriverStats
-              meetingId={params.id}
-              initialData={driverStats}
-              isLive={meeting.dashboard_link.trim() !== ""}
-            />
-          )}
-        </Card>
-      </div>
+            {hasDriverStats && (
+                <LiveDriverStats
+                    meetingId={params.id}
+                    initialData={driverStats}
+                    isLive={meeting.dashboard_link.trim() !== ""}
+                />
+            )}
+          </Card>
+        </div>
     )
   } catch (error) {
     console.error("Error in MeetingPage:", error)
