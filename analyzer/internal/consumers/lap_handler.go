@@ -20,12 +20,12 @@ func NewLapHandler(repo *repositories.LapRepository, exporter *metrics.Exporter)
 }
 
 func (h *LapHandler) Setup(sarama.ConsumerGroupSession) error {
-	log.Println("Kafka consumer setup completed")
+	log.Println("Kafka laps consumer setup completed")
 	return nil
 }
 
 func (h *LapHandler) Cleanup(sarama.ConsumerGroupSession) error {
-	log.Println("Kafka consumer cleanup completed")
+	log.Println("Kafka laps consumer cleanup completed")
 	return nil
 }
 

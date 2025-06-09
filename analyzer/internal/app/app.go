@@ -30,8 +30,11 @@ type App struct {
 	teamRepo    *repositories.TeamRepository
 	meetingRepo *repositories.MeetingRepository
 
-	LapHandler *consumers.LapHandler
-	Exporter   *metrics.Exporter
+	LapHandler     *consumers.LapHandler
+	DriverHandler  *consumers.DriverHandler
+	MeetingHandler *consumers.MeetingHandler
+	TeamHandler    *consumers.TeamHandler
+	Exporter       *metrics.Exporter
 
 	Server web.HttpServer
 }
@@ -51,6 +54,9 @@ func NewApp(cfg *config.Config) *App {
 
 	exporter := metrics.NewMetricsExporter()
 	lapHandler := consumers.NewLapHandler(lapRepo, exporter)
+	driverHandler := consumers.NewDriverHandler(driverRepo)
+	meetingHandler := consumers.NewMeetingHandler(meetingRepo)
+	teamHandler := consumers.NewTeamHandler(teamRepo)
 
 	db := stdlib.OpenDBFromPool(pool)
 
@@ -73,16 +79,19 @@ func NewApp(cfg *config.Config) *App {
 	}
 
 	return &App{
-		Cfg:         cfg,
-		pool:        pool,
-		trManager:   trManager,
-		lapRepo:     lapRepo,
-		driverRepo:  driverRepo,
-		teamRepo:    teamRepo,
-		meetingRepo: meetingRepo,
-		LapHandler:  lapHandler,
-		Exporter:    exporter,
-		Server:      server,
+		Cfg:            cfg,
+		pool:           pool,
+		trManager:      trManager,
+		lapRepo:        lapRepo,
+		driverRepo:     driverRepo,
+		teamRepo:       teamRepo,
+		meetingRepo:    meetingRepo,
+		LapHandler:     lapHandler,
+		DriverHandler:  driverHandler,
+		MeetingHandler: meetingHandler,
+		TeamHandler:    teamHandler,
+		Exporter:       exporter,
+		Server:         server,
 	}
 }
 

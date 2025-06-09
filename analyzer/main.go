@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/prometheus/client_golang/prometheus"
 	"log"
-	"os"
 	"os/signal"
 	"syscall"
 
@@ -15,6 +14,9 @@ import (
 )
 
 func main() {
+
+	mainCtx, mainCancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer mainCancel()
 
 	cfg, err := config.Get()
 	if err != nil {
@@ -32,24 +34,26 @@ func main() {
 	go func() {
 		log.Printf("Starting metrics server at :%s", application.Cfg.ServerPort)
 		if err := application.Server.ListenAndServe(); err != nil {
+			mainCancel()
 			log.Fatalf("Failed to start metrics server: %v", err)
 		}
 	}()
 
-	go runConsumer(context.Background(), consumer, application.LapHandler, application)
+	runConsumers(mainCtx, application)
 
-	waitForShutdown()
+	<-mainCtx.Done()
+
 }
 
 func setupKafkaConsumer(cfg *config.Config) sarama.ConsumerGroup {
-	config := sarama.NewConfig()
-	config.Version = sarama.V2_5_0_0
-	config.Consumer.Group.Rebalance.GroupStrategies = []sarama.BalanceStrategy{
+	kafkaConfig := sarama.NewConfig()
+	kafkaConfig.Version = sarama.V2_5_0_0
+	kafkaConfig.Consumer.Group.Rebalance.GroupStrategies = []sarama.BalanceStrategy{
 		sarama.NewBalanceStrategyRange(),
 	}
-	config.Consumer.Offsets.Initial = sarama.OffsetOldest
+	kafkaConfig.Consumer.Offsets.Initial = sarama.OffsetOldest
 
-	consumer, err := sarama.NewConsumerGroup([]string{cfg.KafkaBroker}, cfg.KafkaGroupID, config)
+	consumer, err := sarama.NewConsumerGroup([]string{cfg.KafkaBroker}, cfg.KafkaGroupID, kafkaConfig)
 	if err != nil {
 		log.Fatalf("Failed to create Kafka consumer: %v", err)
 	}
@@ -57,20 +61,21 @@ func setupKafkaConsumer(cfg *config.Config) sarama.ConsumerGroup {
 	return consumer
 }
 
-func runConsumer(ctx context.Context, consumer sarama.ConsumerGroup, handler sarama.ConsumerGroupHandler, app *app.App) {
+func runConsumers(ctx context.Context, app *app.App) {
+	go runConsumer(ctx, app, app.LapHandler, app.Cfg.KafkaTopic, "laps")
+	go runConsumer(ctx, app, app.MeetingHandler, "meetings", "meetings")
+	go runConsumer(ctx, app, app.DriverHandler, "drivers", "drivers")
+	go runConsumer(ctx, app, app.TeamHandler, "teams", "teams")
+}
+
+func runConsumer(ctx context.Context, app *app.App, handler sarama.ConsumerGroupHandler, topic, name string) {
+	consumer := setupKafkaConsumer(app.Cfg)
 	for {
-		if err := consumer.Consume(ctx, []string{app.Cfg.KafkaTopic}, handler); err != nil {
-			log.Printf("Error from consumer: %v", err)
+		if err := consumer.Consume(ctx, []string{topic}, handler); err != nil {
+			log.Printf("Error from %s consumer: %v", name, err)
 		}
 		if ctx.Err() != nil {
 			return
 		}
 	}
-}
-
-func waitForShutdown() {
-	sigterm := make(chan os.Signal, 1)
-	signal.Notify(sigterm, syscall.SIGINT, syscall.SIGTERM)
-	<-sigterm
-	log.Println("Received termination signal, initiating shutdown... ", sigterm)
 }
