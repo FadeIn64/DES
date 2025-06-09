@@ -61,3 +61,40 @@ func (q *Queries) GetDriversByTeam(ctx context.Context, teamKey pgtype.Int4) ([]
 	}
 	return items, nil
 }
+
+const upsertDrivers = `-- name: UpsertDrivers :exec
+INSERT INTO drivers(driver_number, team_key, full_name, abbreviation, country, date_of_birth, description)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+ON CONFLICT (driver_number)
+DO UPDATE
+SET
+    team_key = excluded.team_key,
+    full_name = excluded.full_name,
+    abbreviation = excluded.abbreviation,
+    country = excluded.country,
+    date_of_birth = excluded.date_of_birth,
+    description = excluded.description
+`
+
+type UpsertDriversParams struct {
+	DriverNumber int64
+	TeamKey      pgtype.Int4
+	FullName     string
+	Abbreviation string
+	Country      pgtype.Text
+	DateOfBirth  pgtype.Date
+	Description  string
+}
+
+func (q *Queries) UpsertDrivers(ctx context.Context, arg UpsertDriversParams) error {
+	_, err := q.db.Exec(ctx, upsertDrivers,
+		arg.DriverNumber,
+		arg.TeamKey,
+		arg.FullName,
+		arg.Abbreviation,
+		arg.Country,
+		arg.DateOfBirth,
+		arg.Description,
+	)
+	return err
+}

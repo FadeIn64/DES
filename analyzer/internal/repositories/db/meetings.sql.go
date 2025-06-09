@@ -11,50 +11,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createMeeting = `-- name: CreateMeeting :exec
-INSERT INTO meetings (meeting_key, name, description, circuit, location, start_date, end_date, year, dashboard_link) VALUES (
-             $1, $2, $3, $4, $5, $6, $7, $8, $9
-         )
-ON CONFLICT (meeting_key)
-do update
-set
-    name = excluded.name,
-    description = excluded.description,
-    circuit = excluded.circuit,
-    location = excluded.location,
-    start_date = excluded.start_date,
-    end_date = excluded.end_date,
-    year = excluded.year,
-    dashboard_link = excluded.dashboard_link
-`
-
-type CreateMeetingParams struct {
-	MeetingKey    int64
-	Name          string
-	Description   string
-	Circuit       string
-	Location      string
-	StartDate     pgtype.Timestamptz
-	EndDate       pgtype.Timestamptz
-	Year          int32
-	DashboardLink pgtype.Text
-}
-
-func (q *Queries) CreateMeeting(ctx context.Context, arg CreateMeetingParams) error {
-	_, err := q.db.Exec(ctx, createMeeting,
-		arg.MeetingKey,
-		arg.Name,
-		arg.Description,
-		arg.Circuit,
-		arg.Location,
-		arg.StartDate,
-		arg.EndDate,
-		arg.Year,
-		arg.DashboardLink,
-	)
-	return err
-}
-
 const getCurrentMeeting = `-- name: GetCurrentMeeting :one
 SELECT meeting_key, name, description, circuit, location, start_date, end_date, year, dashboard_link FROM meetings
 WHERE start_date <= NOW() AND end_date >= NOW()
@@ -133,4 +89,48 @@ func (q *Queries) GetMeetings(ctx context.Context) ([]Meeting, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const upsertMeeting = `-- name: UpsertMeeting :exec
+INSERT INTO meetings (meeting_key, name, description, circuit, location, start_date, end_date, year, dashboard_link) VALUES (
+             $1, $2, $3, $4, $5, $6, $7, $8, $9
+         )
+ON CONFLICT (meeting_key)
+do update
+set
+    name = excluded.name,
+    description = excluded.description,
+    circuit = excluded.circuit,
+    location = excluded.location,
+    start_date = excluded.start_date,
+    end_date = excluded.end_date,
+    year = excluded.year,
+    dashboard_link = excluded.dashboard_link
+`
+
+type UpsertMeetingParams struct {
+	MeetingKey    int64
+	Name          string
+	Description   string
+	Circuit       string
+	Location      string
+	StartDate     pgtype.Timestamptz
+	EndDate       pgtype.Timestamptz
+	Year          int32
+	DashboardLink pgtype.Text
+}
+
+func (q *Queries) UpsertMeeting(ctx context.Context, arg UpsertMeetingParams) error {
+	_, err := q.db.Exec(ctx, upsertMeeting,
+		arg.MeetingKey,
+		arg.Name,
+		arg.Description,
+		arg.Circuit,
+		arg.Location,
+		arg.StartDate,
+		arg.EndDate,
+		arg.Year,
+		arg.DashboardLink,
+	)
+	return err
 }

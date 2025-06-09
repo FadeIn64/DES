@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getAllTeams = `-- name: GetAllTeams :many
@@ -54,4 +56,35 @@ func (q *Queries) GetTeamByID(ctx context.Context, teamKey int64) (Team, error) 
 		&i.Color,
 	)
 	return i, err
+}
+
+const upsertTeam = `-- name: UpsertTeam :exec
+INSERT INTO teams(team_key, name, description, country, color)
+VALUES ($1, $2, $3, $4, $5)
+ON CONFLICT (team_key)
+DO UPDATE
+SET
+    name = excluded.name,
+    description = excluded.description,
+    country = excluded.country,
+    color = excluded.color
+`
+
+type UpsertTeamParams struct {
+	TeamKey     int64
+	Name        string
+	Description string
+	Country     pgtype.Text
+	Color       pgtype.Text
+}
+
+func (q *Queries) UpsertTeam(ctx context.Context, arg UpsertTeamParams) error {
+	_, err := q.db.Exec(ctx, upsertTeam,
+		arg.TeamKey,
+		arg.Name,
+		arg.Description,
+		arg.Country,
+		arg.Color,
+	)
+	return err
 }

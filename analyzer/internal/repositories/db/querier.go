@@ -11,7 +11,6 @@ import (
 )
 
 type Querier interface {
-	CreateMeeting(ctx context.Context, arg CreateMeetingParams) error
 	ExecCompletedLapByDriver(ctx context.Context, arg ExecCompletedLapByDriverParams) (int64, error)
 	GetAllTeams(ctx context.Context) ([]Team, error)
 	GetAverageLapTime(ctx context.Context, arg GetAverageLapTimeParams) (float64, error)
@@ -29,8 +28,11 @@ type Querier interface {
 	GetMeetings(ctx context.Context) ([]Meeting, error)
 	GetTeamByID(ctx context.Context, teamKey int64) (Team, error)
 	MoveCompleteLap(ctx context.Context, arg MoveCompleteLapParams) error
+	UpsertDrivers(ctx context.Context, arg UpsertDriversParams) error
 	UpsertDriversInterval(ctx context.Context, arg UpsertDriversIntervalParams) error
 	UpsertLap(ctx context.Context, arg UpsertLapParams) error
+	UpsertMeeting(ctx context.Context, arg UpsertMeetingParams) error
+	UpsertTeam(ctx context.Context, arg UpsertTeamParams) error
 }
 
 var _ Querier = (*Queries)(nil)

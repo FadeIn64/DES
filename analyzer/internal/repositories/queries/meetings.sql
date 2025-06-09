@@ -11,7 +11,7 @@ SELECT * from meetings
 SELECT * FROM meetings
     ORDER BY start_date;
 
--- name: CreateMeeting :exec
+-- name: UpsertMeeting :exec
 INSERT INTO meetings (meeting_key, name, description, circuit, location, start_date, end_date, year, dashboard_link) VALUES (
              $1, $2, $3, $4, $5, $6, $7, $8, $9
          )
