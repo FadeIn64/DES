@@ -5,12 +5,12 @@ go 1.23.0
 toolchain go1.23.5
 
 require (
-	github.com/IBM/sarama v1.45.1
+	github.com/IBM/sarama v1.45.2
 	github.com/avito-tech/go-transaction-manager v1.5.0
 	github.com/avito-tech/go-transaction-manager/trm/v2 v2.0.0
 	github.com/gin-contrib/cors v1.7.5
 	github.com/gin-gonic/gin v1.10.1
-	github.com/jackc/pgx/v5 v5.7.4
+	github.com/jackc/pgx/v5 v5.7.5
 	github.com/pressly/goose/v3 v3.24.3
 	github.com/prometheus/client_golang v1.22.0
 	github.com/spf13/viper v1.20.1
