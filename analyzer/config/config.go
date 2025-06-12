@@ -16,7 +16,6 @@ type Config struct {
 	KafkaTopic   string `mapstructure:"kafka_topic"`
 	KafkaGroupID string `mapstructure:"kafka_group_id"`
 	PGConnString string `mapstructure:"db_url"`
-	SectorsCount int    `mapstructure:"sectors_count"`
 	ServerPort   string `mapstructure:"server_port"`
 }
 
