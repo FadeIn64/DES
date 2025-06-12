@@ -26,9 +26,6 @@ func main() {
 	application := app.NewApp(cfg)
 	defer application.Close()
 
-	consumer := setupKafkaConsumer(cfg)
-	defer consumer.Close()
-
 	prometheus.MustRegister(application.Exporter)
 
 	go func() {
