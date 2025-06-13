@@ -183,7 +183,7 @@ func (r *LapRepository) ProcessLap(ctx context.Context, lap models.Lap) (*models
 			paceDiff := analysis.AverageSegmentPace - nextDriverSegmentPace.AveragePace
 			if paceDiff > 0 {
 				predictOvertakeFloat := -1 * math.Ceil(interval/paceDiff)
-				if predictOvertakeFloat < 11 {
+				if predictOvertakeFloat < MaxLapsToOvertake {
 					predictOvertake = int(predictOvertakeFloat)
 				}
 			}
